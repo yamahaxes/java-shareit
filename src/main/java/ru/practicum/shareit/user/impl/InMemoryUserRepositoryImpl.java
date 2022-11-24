@@ -38,7 +38,7 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
         emailNotExists(user.getEmail(), user.getId());
 
         User updatedUser = users.get(user.getId());
-        if (user.getName() != null){
+        if (user.getName() != null) {
             updatedUser.setName(user.getName());
         }
         if (user.getEmail() != null) {
@@ -65,19 +65,19 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
         return user;
     }
 
-    private void userExists(long id){
-        if (!users.containsKey(id)){
+    private void userExists(long id) {
+        if (!users.containsKey(id)) {
             throw new EntityNotFoundException("User not found: id=" + id);
         }
     }
 
-    private void emailNotExists(String email, long excludeId){
+    private void emailNotExists(String email, long excludeId) {
         long count = users
                 .values()
                 .stream()
                 .filter(user -> user.getEmail().equals(email) && user.getId() != excludeId)
                 .count();
-        if (count > 0){
+        if (count > 0) {
             throw new EntityAlreadyExistsException("Email is already taken: " + email);
         }
     }

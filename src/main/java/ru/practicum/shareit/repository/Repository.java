@@ -2,7 +2,7 @@ package ru.practicum.shareit.repository;
 
 import java.util.List;
 
-public interface Repository <T>{
+public interface Repository<T> {
     T create(T obj);
 
     T get(long id);

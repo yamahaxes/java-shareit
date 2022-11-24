@@ -58,15 +58,15 @@ public class InMemoryItemRepositoryImpl implements ItemRepository {
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("Item not found"));
 
-        if (item.getName() != null){
+        if (item.getName() != null) {
             patchedItem.setName(item.getName());
         }
 
-        if (item.getDescription() != null){
+        if (item.getDescription() != null) {
             patchedItem.setDescription(item.getDescription());
         }
 
-        if (item.getAvailable() != null){
+        if (item.getAvailable() != null) {
             patchedItem.setAvailable(item.getAvailable());
         }
 

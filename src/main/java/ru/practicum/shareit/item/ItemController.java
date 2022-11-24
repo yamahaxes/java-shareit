@@ -16,30 +16,30 @@ public class ItemController {
 
     @PostMapping
     public ItemDto create(@RequestHeader("X-Sharer-User-Id") long userId,
-                          @Valid @RequestBody ItemDto itemDto){
+                          @Valid @RequestBody ItemDto itemDto) {
         return itemService.create(itemDto, userId);
     }
 
     @PatchMapping("/{itemId}")
     public ItemDto patch(@RequestHeader("X-Sharer-User-Id") long userId,
                          @PathVariable long itemId,
-                         @RequestBody ItemDto itemDto){
+                         @RequestBody ItemDto itemDto) {
         itemDto.setId(itemId);
         return itemService.patch(itemDto, userId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto get(@PathVariable long itemId){
+    public ItemDto get(@PathVariable long itemId) {
         return itemService.get(itemId);
     }
 
     @GetMapping
-    public List<ItemDto> getByUser(@RequestHeader("X-Sharer-User-Id") long userId){
+    public List<ItemDto> getByUser(@RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.getByUser(userId);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> search(@RequestParam String text){
+    public List<ItemDto> search(@RequestParam String text) {
         return itemService.search(text);
     }
 }
