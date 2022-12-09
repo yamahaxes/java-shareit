@@ -1,10 +1,20 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.Data;
+import lombok.*;
+import org.hibernate.Hibernate;
+import ru.practicum.shareit.user.model.User;
 
-@Data
+import javax.persistence.*;
+import java.util.Objects;
+
+@Entity
+@Table(name = "items", schema = "public")
+@Getter @Setter @ToString
+@RequiredArgsConstructor
 public class Item {
-    private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String name;
 
@@ -12,7 +22,26 @@ public class Item {
 
     private Boolean available;
 
+    @ManyToOne
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
+
+    /*@Transient
     private long ownerId;
 
-    private long itemRequestId;
+    @Transient
+    private long itemRequestId;*/
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Item item = (Item) o;
+        return id != null && Objects.equals(id, item.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
