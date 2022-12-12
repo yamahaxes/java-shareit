@@ -27,7 +27,7 @@ public class BookingController {
                                      @PathVariable long bookingId,
                                      @RequestParam boolean approved) {
 
-        return null;
+        return service.approve(bookingId, userId, approved);
     }
 
     @GetMapping("/{bookingId}")
