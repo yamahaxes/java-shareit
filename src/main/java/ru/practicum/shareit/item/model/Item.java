@@ -26,12 +26,6 @@ public class Item {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-    /*@Transient
-    private long ownerId;
-
-    @Transient
-    private long itemRequestId;*/
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

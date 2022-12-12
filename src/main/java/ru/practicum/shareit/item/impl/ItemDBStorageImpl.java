@@ -5,11 +5,11 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.ItemRepository;
 
 @Repository
-public class ItemDBStorage {
+public class ItemDBStorageImpl {
     private final ItemRepository repository;
 
     @Autowired
-    public ItemDBStorage(ItemRepository repository) {
+    public ItemDBStorageImpl(ItemRepository repository) {
         this.repository = repository;
     }
 
