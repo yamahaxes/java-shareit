@@ -122,13 +122,13 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDtoResponse> getAllBooked(long userId, String state) {
 
+        LocalDateTime now = LocalDateTime.now();
+
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException();
         }
 
         List<Booking> bookings;
-
-        LocalDateTime now = LocalDateTime.now();
 
         switch (state.toUpperCase()) {
             case "ALL":
@@ -159,12 +159,13 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDtoResponse> getAllByOwner(long ownerId, String state) {
 
+        LocalDateTime now = LocalDateTime.now();
+
         if (!userRepository.existsById(ownerId)) {
             throw new UserNotFoundException();
         }
 
         List<Booking> bookings;
-        LocalDateTime now = LocalDateTime.now();
 
         switch (state.toUpperCase()) {
             case "ALL":
