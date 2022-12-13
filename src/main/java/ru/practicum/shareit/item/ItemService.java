@@ -10,9 +10,9 @@ public interface ItemService {
 
     ItemDto patch(ItemDto itemDto, long ownerId);
 
-    ItemDto get(long id);
+    ItemDto get(long userId, long itemId);
 
     List<ItemDto> getByUser(long ownerId);
 
-    List<ItemDto> search(String text);
+    List<ItemDto> search(long userId, String text);
 }

@@ -29,8 +29,9 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto get(@PathVariable long itemId) {
-        return itemService.get(itemId);
+    public ItemDto get(@RequestHeader("X-Sharer-User-Id") long userId,
+                       @PathVariable long itemId) {
+        return itemService.get(userId, itemId);
     }
 
     @GetMapping
@@ -39,7 +40,8 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> search(@RequestParam String text) {
-        return itemService.search(text.toLowerCase());
+    public List<ItemDto> search(@RequestHeader("X-Sharer-User-Id") long userId,
+                                @RequestParam String text) {
+        return itemService.search(userId, text.toLowerCase());
     }
 }

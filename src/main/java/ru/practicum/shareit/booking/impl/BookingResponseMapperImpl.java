@@ -1,6 +1,6 @@
 package ru.practicum.shareit.booking.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.model.Booking;
@@ -10,17 +10,12 @@ import ru.practicum.shareit.mapper.ModelMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
+@AllArgsConstructor
 @Component
 public class BookingResponseMapperImpl implements ModelMapper<Booking, BookingDtoResponse> {
 
     private final ModelMapper<Item, ItemDto> itemMapper;
     private final ModelMapper<User, UserDto> userMapper;
-
-    @Autowired
-    public BookingResponseMapperImpl(ModelMapper<Item, ItemDto> itemMapper, ModelMapper<User, UserDto> userMapper) {
-        this.itemMapper = itemMapper;
-        this.userMapper = userMapper;
-    }
 
     @Override
     public Booking mapFromDto(BookingDtoResponse dto) {

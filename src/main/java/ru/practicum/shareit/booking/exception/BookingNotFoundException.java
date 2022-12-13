@@ -1,8 +1,6 @@
 package ru.practicum.shareit.booking.exception;
 
-import ru.practicum.shareit.exception.EntityNotFoundException;
-
-public class BookingNotFoundException extends EntityNotFoundException {
+public class BookingNotFoundException extends RuntimeException {
     public BookingNotFoundException() {
         super("Booking not found.");
     }

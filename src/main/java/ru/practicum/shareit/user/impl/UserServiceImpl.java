@@ -3,10 +3,11 @@ package ru.practicum.shareit.user.impl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.mapper.ModelMapper;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.util.ShareItUtils;
 
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;
-    private final UserModelMapperImpl userModelMapper;
+    private final ModelMapper<User, UserDto> userModelMapper;
 
     @Override
     public UserDto create(UserDto userDto) {
@@ -33,7 +34,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto get(long id) {
         if (!repository.existsById(id)){
-            throw new EntityNotFoundException("User not found.");
+            throw new UserNotFoundException();
         }
 
         return userModelMapper.mapToDto(
@@ -44,7 +45,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto patch(UserDto userDto) {
         if (!repository.existsById(userDto.getId())){
-            throw new EntityNotFoundException("User not found.");
+            throw new UserNotFoundException();
         }
 
         User user = userModelMapper.mapFromDto(userDto);
