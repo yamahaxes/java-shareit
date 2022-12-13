@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto get(long id) {
-        if (!repository.existsById(id)){
+        if (!repository.existsById(id)) {
             throw new UserNotFoundException();
         }
 
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto patch(UserDto userDto) {
-        if (!repository.existsById(userDto.getId())){
+        if (!repository.existsById(userDto.getId())) {
             throw new UserNotFoundException();
         }
 

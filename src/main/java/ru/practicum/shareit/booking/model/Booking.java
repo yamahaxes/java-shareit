@@ -12,7 +12,9 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "bookings", schema = "public")
-@Setter @Getter @ToString
+@Setter
+@Getter
+@ToString
 @RequiredArgsConstructor
 public class Booking {
     @Id

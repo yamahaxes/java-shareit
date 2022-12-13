@@ -11,7 +11,9 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "items", schema = "public")
-@Getter @Setter @ToString
+@Getter
+@Setter
+@ToString
 @RequiredArgsConstructor
 public class Item {
     @Id

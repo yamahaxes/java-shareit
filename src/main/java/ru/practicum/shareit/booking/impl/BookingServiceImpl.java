@@ -44,7 +44,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         Item item = itemRepository.getReferenceById(bookingDtoRequest.getItemId());
-        if (!item.getAvailable()){
+        if (!item.getAvailable()) {
             throw new NoAvailableItemNotFoundException();
         }
 
@@ -77,7 +77,7 @@ public class BookingServiceImpl implements BookingService {
             throw new BookingNotFoundException();
         }
 
-        if (!userRepository.existsById(userId)){
+        if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException();
         }
 

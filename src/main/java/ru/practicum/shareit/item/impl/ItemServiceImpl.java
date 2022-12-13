@@ -55,7 +55,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto patch(ItemDto itemDto, long ownerId) {
 
         Item itemTarget = repository.getItemByIdAndOwnerId(itemDto.getId(), ownerId);
-        if (itemTarget == null){
+        if (itemTarget == null) {
             throw new ItemNotFoundException();
         }
 
@@ -96,7 +96,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> search(long userId, String text) {
-        if (text.isBlank()){
+        if (text.isBlank()) {
             return new ArrayList<>();
         }
 

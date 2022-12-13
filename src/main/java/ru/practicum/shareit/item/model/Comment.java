@@ -12,7 +12,9 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "comments", schema = "public")
-@Getter @Setter @ToString
+@Getter
+@Setter
+@ToString
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
