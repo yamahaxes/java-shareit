@@ -4,15 +4,20 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDtoResponseInfo;
+import ru.practicum.shareit.booking.exception.NotFoundBookingException;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.item.CommentRepository;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.ItemService;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.exception.ItemNotFoundException;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.mapper.ModelMapper;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.util.ShareItUtils;
 
 import java.time.LocalDateTime;
@@ -25,10 +30,12 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
 
     private final ModelMapper<Item, ItemDto> itemModelMapper;
+    private final ModelMapper<Booking, BookingDtoResponseInfo> bookingMapper;
+    private final ModelMapper<Comment, CommentDto> commentMapper;
     private final ItemRepository repository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
-    private final ModelMapper<Booking, BookingDtoResponseInfo> bookingMapper;
+    private final CommentRepository commentRepository;
 
     @Override
     public ItemDto create(ItemDto itemDto, long ownerId) {
@@ -94,6 +101,38 @@ public class ItemServiceImpl implements ItemService {
         }
 
         return itemListMapToDto(repository.findContainingText(text), userId);
+    }
+
+    @Override
+    public CommentDto createComment(long userId, CommentDto commentDto) {
+        commentDto.setCreated(LocalDateTime.now());
+
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException();
+        }
+
+        User author = userRepository.getReferenceById(userId);
+        commentDto.setAuthorName(author.getName());
+
+        if (!repository.existsById(commentDto.getItemId())) {
+            throw new ItemNotFoundException();
+        }
+
+        long count = bookingRepository.countAllByBooker_IdAndItem_IdAndEndBefore(userId,
+                commentDto.getItemId(),
+                LocalDateTime.now());
+
+        if (count == 0) {
+            throw new NotFoundBookingException();
+        }
+
+        Item item = repository.getReferenceById(commentDto.getItemId());
+        Comment comment = commentMapper.mapFromDto(commentDto);
+        comment.setItem(item);
+
+        return commentMapper.mapToDto(
+            commentRepository.save(comment)
+        );
     }
 
     private void fillLastNextBooking(ItemDto itemDto) {

@@ -25,7 +25,8 @@ public class ErrorHandler {
     @ExceptionHandler(value = {IncorrectPeriodException.class,
             NoAvailableItemNotFoundException.class,
             UnknownStateException.class,
-            BookingAlreadyApprovedException.class})
+            BookingAlreadyApprovedException.class,
+            NotFoundBookingException.class})
     public Map<String, String> badRequest(RuntimeException e) {
         return Map.of("error", e.getMessage());
     }

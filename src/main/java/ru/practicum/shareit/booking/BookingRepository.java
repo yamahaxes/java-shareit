@@ -51,4 +51,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Booking getFirstByItem_IdAndEndBeforeOrderByEndDesc(long item_id, LocalDateTime end);
 
     Booking getFirstByItem_IdAndStartAfterOrderByStartAsc(long item_id, LocalDateTime start);
+
+    long countAllByBooker_IdAndItem_IdAndEndBefore(long bookerId, long itemId, LocalDateTime end);
 }
