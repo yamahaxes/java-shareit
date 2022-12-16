@@ -15,11 +15,11 @@ import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.mapper.ModelMapper;
 import ru.practicum.shareit.user.UserRepository;
-import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -56,10 +56,16 @@ public class BookingServiceImpl implements BookingService {
             throw new BadRequestException("Incorrect period.");
         }
 
-        User booker = userRepository.getReferenceById(userId);
+        Optional<Booking> foundBooking = repository.checkBookingIntersectionByItem_Id(bookingDtoRequest.getItemId(),
+                bookingDtoRequest.getStart(),
+                bookingDtoRequest.getEnd());
+
+        if (foundBooking.isPresent()) {
+            throw new BadRequestException("Already have a booking.");
+        }
+
+        bookingDtoRequest.setBookerId(userId);
         Booking booking = bookingRequestMapper.mapFromDto(bookingDtoRequest);
-        booking.setBooker(booker);
-        booking.setItem(item);
         booking.setStatus(BookingStatus.WAITING);
 
         return bookingResponseMapper.mapToDto(
@@ -84,6 +90,8 @@ public class BookingServiceImpl implements BookingService {
 
         if (booking.getStatus() == BookingStatus.APPROVED) {
             throw new BadRequestException("Booking already approved.");
+        } else if (booking.getStatus() == BookingStatus.REJECTED) {
+            throw new BadRequestException("Booking already rejected.");
         }
 
         if (approved) {

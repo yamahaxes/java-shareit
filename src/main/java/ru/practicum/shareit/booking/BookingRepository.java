@@ -7,6 +7,7 @@ import ru.practicum.shareit.booking.model.Booking;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> getByBooker_Id(Long bookerId, Sort sort);
@@ -52,5 +53,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Booking getFirstByItem_IdAndStartAfterOrderByStartAsc(long itemId, LocalDateTime start);
 
-    long countAllByBooker_IdAndItem_IdAndEndBeforeAndStatus(Long booker_id, Long item_id, LocalDateTime end, BookingStatus status);
+    long countAllByBooker_IdAndItem_IdAndEndBeforeAndStatus(long booker_id, long item_id, LocalDateTime end, BookingStatus status);
+
+    @Query("SELECT booking " +
+            "FROM Booking booking " +
+            "WHERE booking.id = ?1 " +
+            "   AND (booking.start BETWEEN ?2 AND ?3 OR booking.end BETWEEN ?2 AND ?3) " +
+            "   AND booking.status = 'ACCEPTED'")
+    Optional<Booking> checkBookingIntersectionByItem_Id(long id, LocalDateTime start, LocalDateTime end);
 }
