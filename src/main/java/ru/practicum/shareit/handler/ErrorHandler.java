@@ -4,9 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.shareit.booking.exception.*;
-import ru.practicum.shareit.item.exception.ItemNotFoundException;
-import ru.practicum.shareit.user.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.BadRequestException;
+import ru.practicum.shareit.exception.NotFoundException;
 
 import java.util.Map;
 
@@ -14,28 +13,17 @@ import java.util.Map;
 public class ErrorHandler {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(value = {UserNotFoundException.class,
-            ItemNotFoundException.class,
-            BookingNotFoundException.class})
+    @ExceptionHandler(value = {NotFoundException.class})
     public Map<String, String> entityNotFound(RuntimeException e) {
-        return Map.of("error", e.getMessage());
+        String message = e.getMessage() == null ? "" : e.getMessage();
+        return Map.of("error", message);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(value = {IncorrectPeriodException.class,
-            NoAvailableItemNotFoundException.class,
-            UnknownStateException.class,
-            BookingAlreadyApprovedException.class,
-            NotFoundBookingException.class})
+    @ExceptionHandler(value = {BadRequestException.class})
     public Map<String, String> badRequest(RuntimeException e) {
-        return Map.of("error", e.getMessage());
+        String message = e.getMessage() == null ? "" : e.getMessage();
+        return Map.of("error", message);
     }
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(value = {UserNotOwnerOrBookerException.class,
-            UserNotOwnerException.class,
-            UserIsOwnerException.class})
-    public Map<String, String> notFound(RuntimeException e) {
-        return Map.of("error", e.getMessage());
-    }
 }

@@ -3,11 +3,11 @@ package ru.practicum.shareit.user.impl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.mapper.ModelMapper;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.util.ShareItUtils;
 
@@ -33,9 +33,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto get(long id) {
-        if (!repository.existsById(id)) {
-            throw new UserNotFoundException();
-        }
+        existsUserByUserIdOrThrow(id);
 
         return userModelMapper.mapToDto(
                 repository.getReferenceById(id)
@@ -44,9 +42,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto patch(UserDto userDto) {
-        if (!repository.existsById(userDto.getId())) {
-            throw new UserNotFoundException();
-        }
+        existsUserByUserIdOrThrow(userDto.getId());
 
         User user = userModelMapper.mapFromDto(userDto);
         User userTarget = repository.getReferenceById(userDto.getId());
@@ -69,5 +65,11 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(userModelMapper::mapToDto)
                 .collect(Collectors.toList());
+    }
+
+    private void existsUserByUserIdOrThrow(long userId) {
+        if (!repository.existsById(userId)) {
+            throw new NotFoundException();
+        }
     }
 }

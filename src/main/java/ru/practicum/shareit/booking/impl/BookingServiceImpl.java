@@ -8,17 +8,17 @@ import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
-import ru.practicum.shareit.booking.exception.*;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.exception.BadRequestException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.ItemRepository;
-import ru.practicum.shareit.item.exception.ItemNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.mapper.ModelMapper;
 import ru.practicum.shareit.user.UserRepository;
-import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,27 +35,25 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDtoResponse create(BookingDtoRequest bookingDtoRequest, long userId) {
 
-        if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException();
-        }
+        existsUserByIdOrThrow(userId);
 
         if (!itemRepository.existsById(bookingDtoRequest.getItemId())) {
-            throw new ItemNotFoundException();
+            throw new NotFoundException();
         }
 
         Item item = itemRepository.getReferenceById(bookingDtoRequest.getItemId());
         if (!item.getAvailable()) {
-            throw new NoAvailableItemNotFoundException();
+            throw new BadRequestException("No available item not found.");
         }
 
         if (item.getOwner().getId() == userId) {
-            throw new UserIsOwnerException();
+            throw new NotFoundException("User is the owner the item.");
         }
 
         LocalDateTime now = LocalDateTime.now();
         if (!bookingDtoRequest.getStart().isBefore(bookingDtoRequest.getEnd())
                 || bookingDtoRequest.getStart().isBefore(now)) {
-            throw new IncorrectPeriodException();
+            throw new BadRequestException("Incorrect period.");
         }
 
         User booker = userRepository.getReferenceById(userId);
@@ -73,23 +71,19 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDtoResponse approve(long bookingId, long userId, boolean approved) {
 
-        if (!repository.existsById(bookingId)) {
-            throw new BookingNotFoundException();
-        }
+        existsBookingByIdOrThrow(bookingId);
 
-        if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException();
-        }
+        existsUserByIdOrThrow(userId);
 
         Booking booking = repository.getReferenceById(bookingId);
         Item item = booking.getItem();
 
         if (item.getOwner().getId() != userId) {
-            throw new UserNotOwnerException();
+            throw new NotFoundException("User is not the owner.");
         }
 
         if (booking.getStatus() == BookingStatus.APPROVED) {
-            throw new BookingAlreadyApprovedException();
+            throw new BadRequestException("Booking already approved.");
         }
 
         if (approved) {
@@ -106,14 +100,12 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDtoResponse getById(long bookingId, long userId) {
 
-        if (!repository.existsById(bookingId)) {
-            throw new BookingNotFoundException();
-        }
+        existsBookingByIdOrThrow(bookingId);
 
         Booking booking = repository.getReferenceById(bookingId);
         if (booking.getBooker().getId() != userId
                 && booking.getItem().getOwner().getId() != userId) {
-            throw new UserNotOwnerOrBookerException();
+            throw new NotFoundException("User not owner or booker.");
         }
 
         return bookingResponseMapper.mapToDto(booking);
@@ -124,11 +116,9 @@ public class BookingServiceImpl implements BookingService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException();
-        }
+        existsUserByIdOrThrow(userId);
 
-        List<Booking> bookings;
+        List<Booking> bookings = new ArrayList<>();
 
         switch (state.toUpperCase()) {
             case "ALL":
@@ -150,7 +140,7 @@ public class BookingServiceImpl implements BookingService {
                 bookings = repository.getByBooker_IdAndStatusEquals(userId, BookingStatus.REJECTED, Sort.by("start").descending());
                 break;
             default:
-                throw new UnknownStateException();
+                unknownStateThrow(state.toUpperCase());
         }
 
         return bookingListToDtoResponse(bookings);
@@ -161,11 +151,9 @@ public class BookingServiceImpl implements BookingService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        if (!userRepository.existsById(ownerId)) {
-            throw new UserNotFoundException();
-        }
+        existsUserByIdOrThrow(ownerId);
 
-        List<Booking> bookings;
+        List<Booking> bookings = new ArrayList<>();
 
         switch (state.toUpperCase()) {
             case "ALL":
@@ -187,13 +175,29 @@ public class BookingServiceImpl implements BookingService {
                 bookings = repository.getByItem_Owner_idAndStatusEquals(ownerId, BookingStatus.REJECTED, Sort.by("start").descending());
                 break;
             default:
-               throw new UnknownStateException();
+               unknownStateThrow(state.toUpperCase());
         }
 
 
         return bookingListToDtoResponse(bookings);
     }
 
+
+    private void existsUserByIdOrThrow(long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException();
+        }
+    }
+
+    private void existsBookingByIdOrThrow(long bookingId) {
+        if (!repository.existsById(bookingId)) {
+            throw new NotFoundException();
+        }
+    }
+
+    private void unknownStateThrow(String state) {
+        throw new BadRequestException("Unknown state: " + state);
+    }
 
     private List<BookingDtoResponse> bookingListToDtoResponse(List<Booking> bookings) {
         return bookings

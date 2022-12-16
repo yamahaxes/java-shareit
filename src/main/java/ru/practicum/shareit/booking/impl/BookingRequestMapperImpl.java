@@ -19,7 +19,6 @@ public class BookingRequestMapperImpl implements ModelMapper<Booking, BookingDto
 
     @Override
     public BookingDtoRequest mapToDto(Booking booking) {
-        // not used
-        return null;
+        throw new UnsupportedOperationException();
     }
 }

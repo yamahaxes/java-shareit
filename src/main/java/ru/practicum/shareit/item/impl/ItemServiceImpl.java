@@ -3,20 +3,20 @@ package ru.practicum.shareit.item.impl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.dto.BookingDtoResponseInfo;
-import ru.practicum.shareit.booking.exception.NotFoundBookingException;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.exception.BadRequestException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.CommentRepository;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.exception.ItemNotFoundException;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.mapper.ModelMapper;
 import ru.practicum.shareit.user.UserRepository;
-import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.util.ShareItUtils;
 
@@ -39,9 +39,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto create(ItemDto itemDto, long ownerId) {
-        if (!userRepository.existsById(ownerId)) {
-            throw new UserNotFoundException();
-        }
+        existsUserByUserIdOrThrow(ownerId);
 
         Item item = itemModelMapper.mapFromDto(itemDto);
         item.setOwner(userRepository.getReferenceById(ownerId));
@@ -54,10 +52,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto patch(ItemDto itemDto, long ownerId) {
 
-        Item itemTarget = repository.getItemByIdAndOwnerId(itemDto.getId(), ownerId);
-        if (itemTarget == null) {
-            throw new ItemNotFoundException();
-        }
+        Item itemTarget = repository
+                .getItemByIdAndOwnerId(itemDto.getId(), ownerId)
+                .orElseThrow(NotFoundException::new);
 
         Item item = itemModelMapper.mapFromDto(itemDto);
         item.setOwner(userRepository.getReferenceById(ownerId));
@@ -71,9 +68,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto get(long userId, long itemId) {
-        if (!repository.existsById(itemId)) {
-            throw new ItemNotFoundException();
-        }
+        existsItemByIdOrThrow(itemId);
 
         Item item = repository.getReferenceById(itemId);
         ItemDto itemDto = itemModelMapper.mapToDto(item);
@@ -87,9 +82,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getByUser(long ownerId) {
-        if (!userRepository.existsById(ownerId)) {
-            throw new UserNotFoundException();
-        }
+        existsUserByUserIdOrThrow(ownerId);
 
         return itemListMapToDto(repository.getItemsByOwnerId(ownerId), ownerId);
     }
@@ -107,23 +100,20 @@ public class ItemServiceImpl implements ItemService {
     public CommentDto createComment(long userId, CommentDto commentDto) {
         commentDto.setCreated(LocalDateTime.now());
 
-        if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException();
-        }
+        existsUserByUserIdOrThrow(userId);
 
         User author = userRepository.getReferenceById(userId);
         commentDto.setAuthorName(author.getName());
 
-        if (!repository.existsById(commentDto.getItemId())) {
-            throw new ItemNotFoundException();
-        }
+        existsItemByIdOrThrow(commentDto.getItemId());
 
-        long count = bookingRepository.countAllByBooker_IdAndItem_IdAndEndBefore(userId,
+        long count = bookingRepository.countAllByBooker_IdAndItem_IdAndEndBeforeAndStatus(userId,
                 commentDto.getItemId(),
-                LocalDateTime.now());
+                LocalDateTime.now(),
+                BookingStatus.APPROVED);
 
         if (count == 0) {
-            throw new NotFoundBookingException();
+            throw new BadRequestException("The user has not rented an item.");
         }
 
         Item item = repository.getReferenceById(commentDto.getItemId());
@@ -160,5 +150,17 @@ public class ItemServiceImpl implements ItemService {
                     return dto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    private void existsItemByIdOrThrow(long itemId) {
+        if (!repository.existsById(itemId)) {
+            throw new NotFoundException();
+        }
+    }
+
+    private void existsUserByUserIdOrThrow(long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException();
+        }
     }
 }
