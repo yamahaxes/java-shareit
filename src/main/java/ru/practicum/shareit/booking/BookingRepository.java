@@ -62,5 +62,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "   booking " +
             "FROM Booking booking " +
             "WHERE booking.item.id IN (?1) AND booking.status = 'APPROVED' ")
-    List<Booking> getApprovedBookingsByItem(List<Long> itemIds);
+    List<Booking> getApprovedBookingsByItem_Ids(List<Long> itemIds);
 }

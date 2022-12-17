@@ -130,7 +130,7 @@ public class ItemServiceImpl implements ItemService {
         LocalDateTime now = LocalDateTime.now();
 
         List<Long> itemIds = itemDtoList.stream().map(ItemDto::getId).collect(Collectors.toList());
-        List<Booking> approvedBookings = bookingRepository.getApprovedBookingsByItem(itemIds);
+        List<Booking> approvedBookings = bookingRepository.getApprovedBookingsByItem_Ids(itemIds);
 
         itemDtoList.forEach(itemDto -> {
                     Booking nextBooking = approvedBookings.stream()
