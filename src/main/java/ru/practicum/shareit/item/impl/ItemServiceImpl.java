@@ -22,6 +22,7 @@ import ru.practicum.shareit.util.ShareItUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,7 +75,7 @@ public class ItemServiceImpl implements ItemService {
         ItemDto itemDto = itemModelMapper.mapToDto(item);
 
         if (userId == item.getOwner().getId()) {
-            fillLastNextBooking(itemDto);
+            fillLastNextBooking(List.of(itemDto));
         }
 
         return itemDto;
@@ -125,42 +126,55 @@ public class ItemServiceImpl implements ItemService {
         );
     }
 
-    private void fillLastNextBooking(ItemDto itemDto) {
+    private void fillLastNextBooking(List<ItemDto> itemDtoList) {
         LocalDateTime now = LocalDateTime.now();
 
-        BookingDtoResponseInfo lastBooking = bookingMapper.mapToDto(
-                bookingRepository.getFirstByItem_IdAndEndBeforeOrderByEndDesc(itemDto.getId(), now)
-        );
+        List<Long> itemIds = itemDtoList.stream().map(ItemDto::getId).collect(Collectors.toList());
+        List<Booking> approvedBookings = bookingRepository.getApprovedBookingsByItem(itemIds);
 
-        BookingDtoResponseInfo nextBooking = bookingMapper.mapToDto(
-                bookingRepository.getFirstByItem_IdAndStartAfterOrderByStartAsc(itemDto.getId(), now)
-        );
+        itemDtoList.forEach(itemDto -> {
+                    Booking nextBooking = approvedBookings.stream()
+                            .filter(booking -> booking.getItem().getId() == itemDto.getId() && booking.getStart().isAfter(now))
+                            .min(Comparator.comparing(Booking::getStart))
+                            .orElse(null);
 
-        itemDto.setLastBooking(lastBooking);
-        itemDto.setNextBooking(nextBooking);
+                    Booking lastBooking = approvedBookings.stream()
+                            .filter(booking -> booking.getItem().getId() == itemDto.getId() && booking.getStart().isBefore(now))
+                            .max(Comparator.comparing(Booking::getStart))
+                            .orElse(null);
+
+                    itemDto.setNextBooking(bookingMapper.mapToDto(nextBooking));
+                    itemDto.setLastBooking(bookingMapper.mapToDto(lastBooking));
+        });
     }
 
     private List<ItemDto> itemListMapToDto(List<Item> items, long userId) {
-        return items.stream()
+        List<ItemDto> allItemDto;
+        List<ItemDto> itemDtoWithBooking = new ArrayList<>();
+
+        allItemDto = items.stream()
                 .map(item -> {
                     ItemDto dto = itemModelMapper.mapToDto(item);
                     if (item.getOwner().getId() == userId) {
-                        fillLastNextBooking(dto);
+                        itemDtoWithBooking.add(dto);
                     }
                     return dto;
                 })
                 .collect(Collectors.toList());
+
+        fillLastNextBooking(itemDtoWithBooking);
+        return allItemDto;
     }
 
     private void existsItemByIdOrThrow(long itemId) {
         if (!repository.existsById(itemId)) {
-            throw new NotFoundException();
+            throw new NotFoundException("Item not found.");
         }
     }
 
     private void existsUserByUserIdOrThrow(long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new NotFoundException();
+            throw new NotFoundException("User not found.");
         }
     }
 }

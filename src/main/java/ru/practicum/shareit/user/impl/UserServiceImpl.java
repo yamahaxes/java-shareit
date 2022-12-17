@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
 
     private void existsUserByUserIdOrThrow(long userId) {
         if (!repository.existsById(userId)) {
-            throw new NotFoundException();
+            throw new NotFoundException("User not found.");
         }
     }
 }

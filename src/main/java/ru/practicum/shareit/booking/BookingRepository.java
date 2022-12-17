@@ -49,10 +49,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
            "   AND ?2 BETWEEN booking.start AND booking.end ")
     List<Booking> getByItem_Owner_idAndBetweenStartAndEnd(long ownerId, LocalDateTime dateTime, Sort sort);
 
-    Booking getFirstByItem_IdAndEndBeforeOrderByEndDesc(long itemId, LocalDateTime end);
-
-    Booking getFirstByItem_IdAndStartAfterOrderByStartAsc(long itemId, LocalDateTime start);
-
     long countAllByBooker_IdAndItem_IdAndEndBeforeAndStatus(long booker_id, long item_id, LocalDateTime end, BookingStatus status);
 
     @Query("SELECT booking " +
@@ -61,4 +57,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "   AND (booking.start BETWEEN ?2 AND ?3 OR booking.end BETWEEN ?2 AND ?3) " +
             "   AND booking.status = 'ACCEPTED'")
     Optional<Booking> checkBookingIntersectionByItem_Id(long id, LocalDateTime start, LocalDateTime end);
+
+    @Query("SELECT " +
+            "   booking " +
+            "FROM Booking booking " +
+            "WHERE booking.item.id IN (?1) AND booking.status = 'APPROVED' ")
+    List<Booking> getApprovedBookingsByItem(List<Long> itemIds);
 }

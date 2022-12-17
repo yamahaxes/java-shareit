@@ -193,13 +193,13 @@ public class BookingServiceImpl implements BookingService {
 
     private void existsUserByIdOrThrow(long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new NotFoundException();
+            throw new NotFoundException("User not found.");
         }
     }
 
     private void existsBookingByIdOrThrow(long bookingId) {
         if (!repository.existsById(bookingId)) {
-            throw new NotFoundException();
+            throw new NotFoundException("Booking not found.");
         }
     }
 
