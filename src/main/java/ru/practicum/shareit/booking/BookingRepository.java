@@ -49,7 +49,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
            "   AND ?2 BETWEEN booking.start AND booking.end ")
     List<Booking> getByItem_Owner_idAndBetweenStartAndEnd(long ownerId, LocalDateTime dateTime, Sort sort);
 
-    long countAllByBooker_IdAndItem_IdAndEndBeforeAndStatus(long booker_id, long item_id, LocalDateTime end, BookingStatus status);
+    long countAllByBooker_IdAndItem_IdAndEndBeforeAndStatus(long bookerId, long itemId, LocalDateTime end, BookingStatus status);
 
     @Query("SELECT booking " +
             "FROM Booking booking " +
