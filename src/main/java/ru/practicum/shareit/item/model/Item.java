@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -32,4 +33,7 @@ public class Item {
     @ToString.Exclude
     private List<Comment> comments = new ArrayList<>();
 
+    @OneToOne
+    @JoinColumn(name = "item_request_id")
+    private ItemRequest itemRequest;
 }
