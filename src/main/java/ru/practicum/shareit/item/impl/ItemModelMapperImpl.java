@@ -1,21 +1,24 @@
 package ru.practicum.shareit.item.impl;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.mapper.ModelMapper;
+import ru.practicum.shareit.request.ItemRequestRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Component
 public class ItemModelMapperImpl implements ModelMapper<Item, ItemDto> {
 
     private final ModelMapper<Comment, CommentDto> commentMapper;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     public Item mapFromDto(ItemDto itemDto) {
@@ -24,6 +27,13 @@ public class ItemModelMapperImpl implements ModelMapper<Item, ItemDto> {
         item.setName(itemDto.getName());
         item.setDescription(itemDto.getDescription());
         item.setAvailable(itemDto.getAvailable());
+
+        if (itemDto.getRequestId() != null) {
+            if (!itemRequestRepository.existsById(itemDto.getRequestId())) {
+                throw new NotFoundException("Item request not found.");
+            }
+            item.setItemRequest(itemRequestRepository.getReferenceById(itemDto.getRequestId()));
+        }
 
         return item;
     }
@@ -42,6 +52,9 @@ public class ItemModelMapperImpl implements ModelMapper<Item, ItemDto> {
                 .collect(Collectors.toList());
         itemDto.setComments(commentsDto);
 
+        if (item.getItemRequest() != null) {
+            itemDto.setRequestId(item.getItemRequest().getId());
+        }
         return itemDto;
     }
 }

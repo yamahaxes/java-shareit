@@ -2,10 +2,13 @@ package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoResponse;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
@@ -16,7 +19,7 @@ public class ItemRequestController {
 
     @PostMapping
     public ItemRequestDtoResponse create(@RequestHeader("X-Sharer-User-Id") long userId,
-                                         @RequestBody ItemRequestDto itemRequestDto) {
+                                         @Valid @RequestBody ItemRequestDto itemRequestDto) {
         return service.createItemRequest(userId, itemRequestDto);
     }
 
@@ -26,15 +29,22 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
-    public List<ItemRequestDtoResponse> getOtherUserRequests(@RequestHeader("X-Sharer-User-Id") long userId,
-                                               @RequestParam(defaultValue = "0") int from,
-                                               @RequestParam(defaultValue = "0") int size) {
+    public List<ItemRequestDtoResponse> getOtherUserRequestsWithPagination(@RequestHeader("X-Sharer-User-Id") long userId,
+                                               @RequestParam(required = false) Optional<Integer> from,
+                                               @RequestParam(required = false) Optional<Integer> size) {
 
-        return service.getOtherUserRequests(userId, from, size);
+        if (from.isEmpty() && size.isEmpty()) {
+            return service.getOtherUserRequests(userId, 0, Integer.MAX_VALUE);
+        } else if (from.isEmpty() || size.isEmpty()) {
+            throw new BadRequestException();
+        }
+
+        return service.getOtherUserRequests(userId, from.get(), size.get());
     }
 
     @GetMapping("/{id}")
-    public ItemRequestDtoResponse getById(@PathVariable long id) {
-        return service.getById(id);
+    public ItemRequestDtoResponse getById(@RequestHeader("X-Sharer-User-Id") long userId,
+                                          @PathVariable long id) {
+        return service.getById(userId, id);
     }
 }
