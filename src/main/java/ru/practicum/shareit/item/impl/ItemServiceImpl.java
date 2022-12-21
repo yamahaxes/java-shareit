@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.impl;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.BookingStatus;
@@ -82,19 +84,27 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getByUser(long ownerId) {
+    public List<ItemDto> getByUser(long ownerId, int from, int size) {
         existsUserByUserIdOrThrow(ownerId);
 
-        return itemListMapToDto(repository.getItemsByOwnerId(ownerId), ownerId);
+        checkRangePageable(from, size);
+
+        Pageable pageable = PageRequest.of(from / size, size);
+
+        return itemListMapToDto(repository.getItemsByOwnerId(ownerId, pageable), ownerId);
     }
 
     @Override
-    public List<ItemDto> search(long userId, String text) {
+    public List<ItemDto> search(long userId, String text, int from, int size) {
         if (text.isBlank()) {
             return new ArrayList<>();
         }
 
-        return itemListMapToDto(repository.findContainingText(text), userId);
+        checkRangePageable(from, size);
+
+        Pageable pageable = PageRequest.of(from / size, size);
+
+        return itemListMapToDto(repository.findContainingText(text, pageable), userId);
     }
 
     @Override
@@ -134,12 +144,14 @@ public class ItemServiceImpl implements ItemService {
 
         itemDtoList.forEach(itemDto -> {
                     Booking nextBooking = approvedBookings.stream()
-                            .filter(booking -> booking.getItem().getId() == itemDto.getId() && booking.getStart().isAfter(now))
+                            .filter(booking -> booking.getItem().getId() == itemDto.getId()
+                                    && booking.getStart().isAfter(now))
                             .min(Comparator.comparing(Booking::getStart))
                             .orElse(null);
 
                     Booking lastBooking = approvedBookings.stream()
-                            .filter(booking -> booking.getItem().getId() == itemDto.getId() && booking.getStart().isBefore(now))
+                            .filter(booking -> booking.getItem().getId() == itemDto.getId()
+                                    && booking.getStart().isBefore(now))
                             .max(Comparator.comparing(Booking::getStart))
                             .orElse(null);
 
@@ -177,4 +189,11 @@ public class ItemServiceImpl implements ItemService {
             throw new NotFoundException("User not found.");
         }
     }
+
+    private void checkRangePageable(int from, int size) {
+        if (from < 0 || size < 1) {
+            throw new BadRequestException();
+        }
+    }
+
 }

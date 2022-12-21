@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.impl;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
@@ -120,32 +122,35 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoResponse> getAllBooked(long userId, String state) {
+    public List<BookingDtoResponse> getAllBooked(long userId, String state, int from, int size) {
+
+        checkRangePageable(from, size);
 
         LocalDateTime now = LocalDateTime.now();
 
         existsUserByIdOrThrow(userId);
 
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
         List<Booking> bookings = new ArrayList<>();
 
         switch (state.toUpperCase()) {
             case "ALL":
-                bookings = repository.getByBooker_Id(userId, Sort.by("start").descending());
+                bookings = repository.getByBooker_Id(userId, pageable);
                 break;
             case "CURRENT":
-                bookings = repository.getByBooker_IdAndDateBetweenStartAndEnd(userId, now, Sort.by("start").descending());
+                bookings = repository.getByBooker_IdAndDateBetweenStartAndEnd(userId, now, pageable);
                 break;
             case "PAST":
-                bookings = repository.getByBooker_IdAndEndBefore(userId, now, Sort.by("start").descending());
+                bookings = repository.getByBooker_IdAndEndBefore(userId, now, pageable);
                 break;
             case "FUTURE":
-                bookings = repository.getByBooker_IdAndStartAfter(userId, now, Sort.by("start").descending());
+                bookings = repository.getByBooker_IdAndStartAfter(userId, now, pageable);
                 break;
             case "WAITING":
-                bookings = repository.getByBooker_IdAndStatusEquals(userId, BookingStatus.WAITING, Sort.by("start").descending());
+                bookings = repository.getByBooker_IdAndStatusEquals(userId, BookingStatus.WAITING, pageable);
                 break;
             case "REJECTED":
-                bookings = repository.getByBooker_IdAndStatusEquals(userId, BookingStatus.REJECTED, Sort.by("start").descending());
+                bookings = repository.getByBooker_IdAndStatusEquals(userId, BookingStatus.REJECTED, pageable);
                 break;
             default:
                 unknownStateThrow(state.toUpperCase());
@@ -155,32 +160,35 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoResponse> getAllByOwner(long ownerId, String state) {
+    public List<BookingDtoResponse> getAllByOwner(long ownerId, String state, int from, int size) {
+
+        checkRangePageable(from, size);
 
         LocalDateTime now = LocalDateTime.now();
 
         existsUserByIdOrThrow(ownerId);
 
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
         List<Booking> bookings = new ArrayList<>();
 
         switch (state.toUpperCase()) {
             case "ALL":
-                bookings = repository.getByItem_Owner_Id(ownerId, Sort.by("start").descending());
+                bookings = repository.getByItem_Owner_Id(ownerId, pageable);
                 break;
             case "CURRENT":
-                bookings = repository.getByItem_Owner_idAndBetweenStartAndEnd(ownerId, now, Sort.by("start").descending());
+                bookings = repository.getByItem_Owner_idAndBetweenStartAndEnd(ownerId, now, pageable);
                 break;
             case "PAST":
-                bookings = repository.getByItem_Owner_idAndEndBefore(ownerId, now, Sort.by("start").descending());
+                bookings = repository.getByItem_Owner_idAndEndBefore(ownerId, now, pageable);
                 break;
             case "FUTURE":
-                bookings = repository.getByItem_Owner_idAndStartAfter(ownerId, now, Sort.by("start").descending());
+                bookings = repository.getByItem_Owner_idAndStartAfter(ownerId, now, pageable);
                 break;
             case "WAITING":
-                bookings = repository.getByItem_Owner_idAndStatusEquals(ownerId, BookingStatus.WAITING, Sort.by("start").descending());
+                bookings = repository.getByItem_Owner_idAndStatusEquals(ownerId, BookingStatus.WAITING, pageable);
                 break;
             case "REJECTED":
-                bookings = repository.getByItem_Owner_idAndStatusEquals(ownerId, BookingStatus.REJECTED, Sort.by("start").descending());
+                bookings = repository.getByItem_Owner_idAndStatusEquals(ownerId, BookingStatus.REJECTED, pageable);
                 break;
             default:
                unknownStateThrow(state.toUpperCase());
@@ -212,6 +220,12 @@ public class BookingServiceImpl implements BookingService {
                 .stream()
                 .map(bookingResponseMapper::mapToDto)
                 .collect(Collectors.toList());
+    }
+
+    private void checkRangePageable(int from, int size) {
+        if (from < 0 || size < 1) {
+            throw new BadRequestException();
+        }
     }
 
 }
