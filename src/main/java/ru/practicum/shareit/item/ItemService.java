@@ -18,4 +18,6 @@ public interface ItemService {
     List<ItemDto> search(long userId, String text, int from, int size);
 
     CommentDto createComment(long userId, CommentDto commentDto);
+
+    void existsItemByIdOrThrow(long itemId);
 }

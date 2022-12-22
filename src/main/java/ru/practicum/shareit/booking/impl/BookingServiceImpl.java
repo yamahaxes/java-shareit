@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking.impl;
 
-import lombok.AllArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -16,28 +15,28 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.mapper.ModelMapper;
-import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.page.CustomRequestPage;
+import ru.practicum.shareit.user.UserService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository repository;
-    private final UserRepository userRepository;
     private final ModelMapper<Booking, BookingDtoRequest> bookingRequestMapper;
     private final ModelMapper<Booking, BookingDtoResponse> bookingResponseMapper;
     private final ItemRepository itemRepository;
+    private final UserService userService;
 
     @Override
     public BookingDtoResponse create(BookingDtoRequest bookingDtoRequest, long userId) {
 
-        existsUserByIdOrThrow(userId);
+        userService.existsUserByUserIdOrThrow(userId);
 
         if (!itemRepository.existsById(bookingDtoRequest.getItemId())) {
             throw new NotFoundException();
@@ -81,7 +80,7 @@ public class BookingServiceImpl implements BookingService {
 
         existsBookingByIdOrThrow(bookingId);
 
-        existsUserByIdOrThrow(userId);
+        userService.existsUserByUserIdOrThrow(userId);
 
         Booking booking = repository.getReferenceById(bookingId);
         Item item = booking.getItem();
@@ -123,96 +122,33 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDtoResponse> getAllBooked(long userId, String state, int from, int size) {
+        userService.existsUserByUserIdOrThrow(userId);
 
-        checkRangePageable(from, size);
+        Pageable requestPage = new CustomRequestPage(from, size, Sort.by("start").descending());
 
-        LocalDateTime now = LocalDateTime.now();
-
-        existsUserByIdOrThrow(userId);
-
-        Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
-        List<Booking> bookings = new ArrayList<>();
-
-        switch (state.toUpperCase()) {
-            case "ALL":
-                bookings = repository.getByBooker_Id(userId, pageable);
-                break;
-            case "CURRENT":
-                bookings = repository.getByBooker_IdAndDateBetweenStartAndEnd(userId, now, pageable);
-                break;
-            case "PAST":
-                bookings = repository.getByBooker_IdAndEndBefore(userId, now, pageable);
-                break;
-            case "FUTURE":
-                bookings = repository.getByBooker_IdAndStartAfter(userId, now, pageable);
-                break;
-            case "WAITING":
-                bookings = repository.getByBooker_IdAndStatusEquals(userId, BookingStatus.WAITING, pageable);
-                break;
-            case "REJECTED":
-                bookings = repository.getByBooker_IdAndStatusEquals(userId, BookingStatus.REJECTED, pageable);
-                break;
-            default:
-                unknownStateThrow(state.toUpperCase());
-        }
-
-        return bookingListToDtoResponse(bookings);
+        return bookingListToDtoResponse(
+                new BookingList(repository)
+                        .getByBookerId(state, userId, requestPage)
+        );
     }
 
     @Override
     public List<BookingDtoResponse> getAllByOwner(long ownerId, String state, int from, int size) {
+        userService.existsUserByUserIdOrThrow(ownerId);
 
-        checkRangePageable(from, size);
+        Pageable pageRequest = new CustomRequestPage(from, size, Sort.by("start").descending());
 
-        LocalDateTime now = LocalDateTime.now();
-
-        existsUserByIdOrThrow(ownerId);
-
-        Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
-        List<Booking> bookings = new ArrayList<>();
-
-        switch (state.toUpperCase()) {
-            case "ALL":
-                bookings = repository.getByItem_Owner_Id(ownerId, pageable);
-                break;
-            case "CURRENT":
-                bookings = repository.getByItem_Owner_idAndBetweenStartAndEnd(ownerId, now, pageable);
-                break;
-            case "PAST":
-                bookings = repository.getByItem_Owner_idAndEndBefore(ownerId, now, pageable);
-                break;
-            case "FUTURE":
-                bookings = repository.getByItem_Owner_idAndStartAfter(ownerId, now, pageable);
-                break;
-            case "WAITING":
-                bookings = repository.getByItem_Owner_idAndStatusEquals(ownerId, BookingStatus.WAITING, pageable);
-                break;
-            case "REJECTED":
-                bookings = repository.getByItem_Owner_idAndStatusEquals(ownerId, BookingStatus.REJECTED, pageable);
-                break;
-            default:
-               unknownStateThrow(state.toUpperCase());
-        }
-
-
-        return bookingListToDtoResponse(bookings);
+        return bookingListToDtoResponse(
+                new BookingList(repository)
+                        .getByItem_Owner_Id(state, ownerId, pageRequest)
+        );
     }
 
-
-    private void existsUserByIdOrThrow(long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new NotFoundException("User not found.");
-        }
-    }
-
-    private void existsBookingByIdOrThrow(long bookingId) {
+    @Override
+    public void existsBookingByIdOrThrow(long bookingId) {
         if (!repository.existsById(bookingId)) {
             throw new NotFoundException("Booking not found.");
         }
-    }
-
-    private void unknownStateThrow(String state) {
-        throw new BadRequestException("Unknown state: " + state);
     }
 
     private List<BookingDtoResponse> bookingListToDtoResponse(List<Booking> bookings) {
@@ -221,11 +157,4 @@ public class BookingServiceImpl implements BookingService {
                 .map(bookingResponseMapper::mapToDto)
                 .collect(Collectors.toList());
     }
-
-    private void checkRangePageable(int from, int size) {
-        if (from < 0 || size < 1) {
-            throw new BadRequestException();
-        }
-    }
-
 }

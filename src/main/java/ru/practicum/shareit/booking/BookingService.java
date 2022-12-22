@@ -18,4 +18,6 @@ public interface BookingService {
     List<BookingDtoResponse> getAllBooked(long userId, String state, int from, int size);
 
     List<BookingDtoResponse> getAllByOwner(long ownerId, String state, int from, int size);
+
+    void existsBookingByIdOrThrow(long bookingId);
 }

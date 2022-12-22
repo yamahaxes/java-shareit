@@ -1,19 +1,19 @@
 package ru.practicum.shareit.request.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.mapper.ModelMapper;
+import ru.practicum.shareit.page.CustomRequestPage;
 import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.request.ItemRequestService;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoResponse;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.user.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,10 +28,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     private final ModelMapper<ItemRequest, ItemRequestDtoResponse> itemRequestDtoResponseMapper;
     private final ModelMapper<ItemRequest, ItemRequestDto> itemRequestDtoMapper;
+    private final UserService userService;
 
     @Override
     public ItemRequestDtoResponse createItemRequest(long userId, ItemRequestDto itemRequestDto) {
-        existsUserOtThrow(userId);
+        userService.existsUserByUserIdOrThrow(userId);
 
         ItemRequest itemRequest = itemRequestDtoMapper.mapFromDto(itemRequestDto);
         itemRequest.setCreated(LocalDateTime.now());
@@ -42,7 +43,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestDtoResponse> getUserRequests(long userId) {
-        existsUserOtThrow(userId);
+        userService.existsUserByUserIdOrThrow(userId);
 
         return mapItemRequestList(
                 repository.getByRequestor_Id(userId, Sort.by("created").descending())
@@ -51,36 +52,26 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestDtoResponse> getOtherUserRequests(long userId, int from, int size) {
-        existsUserOtThrow(userId);
-
-        if (from < 0 || size < 1) {
-            throw new BadRequestException();
-        }
-
-        Pageable pageable = PageRequest.of(from / size, size, Sort.by("created").descending());
+        userService.existsUserByUserIdOrThrow(userId);
+        Pageable requestPage = new CustomRequestPage(from, size, Sort.by("created").descending());
 
         return mapItemRequestList(
-                repository.getOtherUserRequests(userId, pageable)
+                repository.getOtherUserRequests(userId, requestPage)
         );
     }
 
     @Override
     public ItemRequestDtoResponse getById(long userId, long id) {
         existsItemRequestOrThrow(id);
-        existsUserOtThrow(userId);
+        userService.existsUserByUserIdOrThrow(userId);
 
         return itemRequestDtoResponseMapper.mapToDto(repository.getReferenceById(id));
     }
 
-    private void existsItemRequestOrThrow(long id) {
+    @Override
+    public void existsItemRequestOrThrow(long id) {
         if (!repository.existsById(id)) {
             throw new NotFoundException("Item request not found.");
-        }
-    }
-
-    private void existsUserOtThrow(long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new NotFoundException("User not found.");
         }
     }
 

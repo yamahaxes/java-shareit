@@ -17,4 +17,5 @@ public interface ItemRequestService {
 
     ItemRequestDtoResponse getById(long userId, long id);
 
+    void existsItemRequestOrThrow(long id);
 }
