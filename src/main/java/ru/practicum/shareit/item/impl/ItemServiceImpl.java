@@ -33,14 +33,15 @@ import java.util.stream.Collectors;
 @Service
 public class ItemServiceImpl implements ItemService {
 
-    private final ModelMapper<Item, ItemDto> itemModelMapper;
-    private final ModelMapper<Booking, BookingDtoResponseInfo> bookingMapper;
-    private final ModelMapper<Comment, CommentDto> commentMapper;
     private final ItemRepository repository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
     private final UserService userService;
+
+    private final ModelMapper<Item, ItemDto> itemModelMapper;
+    private final ModelMapper<Booking, BookingDtoResponseInfo> bookingMapper;
+    private final ModelMapper<Comment, CommentDto> commentMapper;
 
     @Override
     public ItemDto create(ItemDto itemDto, long ownerId) {
@@ -105,9 +106,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentDto createComment(long userId, CommentDto commentDto) {
-        commentDto.setCreated(LocalDateTime.now());
-
         userService.existsUserByUserIdOrThrow(userId);
+        commentDto.setCreated(LocalDateTime.now());
 
         User author = userRepository.getReferenceById(userId);
         commentDto.setAuthorName(author.getName());
