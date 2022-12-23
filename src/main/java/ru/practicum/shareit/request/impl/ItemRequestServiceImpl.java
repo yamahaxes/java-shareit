@@ -25,10 +25,10 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     private final ItemRequestRepository repository;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     private final ModelMapper<ItemRequest, ItemRequestDtoResponse> itemRequestDtoResponseMapper;
     private final ModelMapper<ItemRequest, ItemRequestDto> itemRequestDtoMapper;
-    private final UserService userService;
 
     @Override
     public ItemRequestDtoResponse createItemRequest(long userId, ItemRequestDto itemRequestDto) {
