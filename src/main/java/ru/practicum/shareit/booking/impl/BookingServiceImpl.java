@@ -28,10 +28,11 @@ import java.util.stream.Collectors;
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository repository;
-    private final ModelMapper<Booking, BookingDtoRequest> bookingRequestMapper;
-    private final ModelMapper<Booking, BookingDtoResponse> bookingResponseMapper;
     private final ItemRepository itemRepository;
     private final UserService userService;
+
+    private final ModelMapper<Booking, BookingDtoRequest> bookingRequestMapper;
+    private final ModelMapper<Booking, BookingDtoResponse> bookingResponseMapper;
 
     @Override
     public BookingDtoResponse create(BookingDtoRequest bookingDtoRequest, long userId) {
