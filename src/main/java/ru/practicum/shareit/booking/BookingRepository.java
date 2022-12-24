@@ -53,10 +53,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("SELECT booking " +
             "FROM Booking booking " +
-            "WHERE booking.id = ?1 " +
-            "   AND (booking.start BETWEEN ?2 AND ?3 OR booking.end BETWEEN ?2 AND ?3) " +
-            "   AND booking.status = 'ACCEPTED'")
-    Optional<Booking> checkBookingIntersectionByItem_Id(long id, LocalDateTime start, LocalDateTime end);
+            "WHERE booking.item.id = ?1 " +
+            "   AND (booking.start BETWEEN ?2 AND ?3 " +
+            "       OR booking.end BETWEEN ?2 AND ?3" +
+            "       OR ?2 BETWEEN booking.start AND booking.end" +
+            "       OR ?3 BETWEEN booking.start AND booking.end) " +
+            "   AND booking.status = 'APPROVED'")
+    Optional<Booking> checkBookingIntersectionByItem_Id(long itemId, LocalDateTime start, LocalDateTime end);
 
     @Query("SELECT " +
             "   booking " +
