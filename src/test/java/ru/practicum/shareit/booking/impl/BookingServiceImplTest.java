@@ -236,7 +236,7 @@ class BookingServiceImplTest {
                 .thenReturn(false);
 
         assertThrows(NotFoundException.class,
-                () -> service.approve(1, 1 ,true));
+                () -> service.approve(1, 1,true));
     }
 
     @Test
