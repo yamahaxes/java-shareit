@@ -35,15 +35,17 @@ class ItemRequestServiceImplTestIT {
     private ItemRequest itemRequest1;
     private ItemRequest itemRequest2;
     private ItemRequest itemRequest3;
+    private User requestor1;
+    private User requestor2;
 
     @BeforeEach
     void setUp() {
 
-        User requestor1 = new User();
+        requestor1 = new User();
         requestor1.setName("user1");
         requestor1.setEmail("user1@mail.com");
 
-        User requestor2 = new User();
+        requestor2 = new User();
         requestor2.setName("user2");
         requestor2.setEmail("user2@mail.com");
         requestor1 = userRepository.save(requestor1);
@@ -66,11 +68,11 @@ class ItemRequestServiceImplTestIT {
 
     @Test
     void getUserRequests() {
-        List<ItemRequestDtoResponse> requests = service.getUserRequests(1);
+        List<ItemRequestDtoResponse> requests = service.getUserRequests(requestor1.getId());
         assertEquals(1, requests.size());
         assertEquals(itemRequest1.getId(), requests.get(0).getId());
 
-        requests = service.getUserRequests(2);
+        requests = service.getUserRequests(requestor2.getId());
 
         assertEquals(2, requests.size());
         assertEquals(itemRequest3.getId(), requests.get(0).getId());
