@@ -8,6 +8,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,10 +30,12 @@ class BookingDtoRequestTest {
 
         JsonContent<BookingDtoRequest> result = json.write(bookingDtoRequest);
 
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+
         assertThat(result).extractingJsonPathNumberValue("$.itemId").isEqualTo(1);
         assertThat(result).extractingJsonPathNumberValue("$.bookerId").isNull();
-        assertThat(result).extractingJsonPathStringValue("$.start").isEqualTo(bookingDtoRequest.getStart().toString());
-        assertThat(result).extractingJsonPathStringValue("$.end").isEqualTo(bookingDtoRequest.getEnd().toString());
+        assertThat(result).extractingJsonPathStringValue("$.start").isEqualTo(bookingDtoRequest.getStart().format(formatter));
+        assertThat(result).extractingJsonPathStringValue("$.end").isEqualTo(bookingDtoRequest.getEnd().format(formatter));
 
     }
 
