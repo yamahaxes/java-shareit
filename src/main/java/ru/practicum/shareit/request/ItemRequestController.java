@@ -2,7 +2,6 @@ package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoResponse;
 
@@ -30,16 +29,10 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestDtoResponse> getOtherUserRequestsWithPagination(@RequestHeader("X-Sharer-User-Id") long userId,
-                                               @RequestParam(required = false) Optional<Integer> from,
+                                               @RequestParam(required = false, defaultValue = "0") int from,
                                                @RequestParam(required = false) Optional<Integer> size) {
 
-        if (from.isEmpty() && size.isEmpty()) {
-            return service.getOtherUserRequests(userId, 0, Integer.MAX_VALUE);
-        } else if (from.isEmpty() || size.isEmpty()) {
-            throw new BadRequestException();
-        }
-
-        return service.getOtherUserRequests(userId, from.get(), size.get());
+        return service.getOtherUserRequests(userId, from, size.orElse(Integer.MAX_VALUE));
     }
 
     @GetMapping("/{id}")

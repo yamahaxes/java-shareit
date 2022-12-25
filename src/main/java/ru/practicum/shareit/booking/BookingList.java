@@ -1,10 +1,8 @@
-package ru.practicum.shareit.booking.impl;
+package ru.practicum.shareit.booking;
 
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import ru.practicum.shareit.booking.BookingRepository;
-import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.BadRequestException;
 
@@ -32,9 +30,8 @@ public class BookingList {
             case "REJECTED":
                 return repository.getByBooker_IdAndStatusEquals(userId, BookingStatus.REJECTED, requestPage);
             default:
-                unknownStateThrow(state.toUpperCase());
+                throw new BadRequestException("Unknown state: " + state);
         }
-        return null;
     }
 
     public List<Booking> getByItem_Owner_Id(String state, long ownerId, Pageable pageRequest) {
@@ -54,12 +51,7 @@ public class BookingList {
             case "REJECTED":
                 return repository.getByItem_Owner_idAndStatusEquals(ownerId, BookingStatus.REJECTED, pageRequest);
             default:
-                unknownStateThrow(state.toUpperCase());
+                throw new BadRequestException("Unknown state: " + state);
         }
-        return null;
-    }
-
-    private void unknownStateThrow(String state) {
-        throw new BadRequestException("Unknown state: " + state);
     }
 }

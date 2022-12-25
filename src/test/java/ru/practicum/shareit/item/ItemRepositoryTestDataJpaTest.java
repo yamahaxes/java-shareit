@@ -12,10 +12,11 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
-class ItemRepositoryTestJpa {
+class ItemRepositoryTestDataJpaTest {
 
     @Autowired
     private UserRepository userRepository;
@@ -41,7 +42,7 @@ class ItemRepositoryTestJpa {
         item1.setAvailable(true);
         item1.setDescription("item1 fgr");
         item1.setName("item1");
-        item1 = itemRepository.save(item1);
+        itemRepository.save(item1);
 
         Item item2 = new Item();
         item2.setOwner(owner);
@@ -55,14 +56,14 @@ class ItemRepositoryTestJpa {
         item3.setAvailable(false);
         item3.setDescription("item3 rty");
         item3.setName("item3");
-        item3 = itemRepository.save(item3);
+        itemRepository.save(item3);
 
         Item item4 = new Item();
         item4.setOwner(owner);
         item4.setAvailable(true);
         item4.setDescription("Item4 ssdf");
         item4.setName("Item4");
-        item4 = itemRepository.save(item4);
+        itemRepository.save(item4);
 
         Pageable pageable = PageRequest.of(0, 100);
         List<Item> itemList = itemRepository.findContainingText("item",

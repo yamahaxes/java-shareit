@@ -2,7 +2,6 @@ package ru.practicum.shareit.item;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
@@ -39,31 +38,24 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDto> getByUser(@RequestHeader("X-Sharer-User-Id") long userId,
-                                   @RequestParam(required = false) Optional<Integer> from,
+                                   @RequestParam(required = false, defaultValue = "0") int from,
                                    @RequestParam(required = false) Optional<Integer> size) {
 
-        if (from.isEmpty() && size.isEmpty()) {
-            return itemService.getByUser(userId, 0, Integer.MAX_VALUE);
-        } else if (from.isEmpty() || size.isEmpty()) {
-            throw new BadRequestException();
-        }
-
-        return itemService.getByUser(userId, from.get(), size.get());
+        return itemService.getByUser(userId,
+                from,
+                size.orElse(Integer.MAX_VALUE));
     }
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestHeader("X-Sharer-User-Id") long userId,
                                 @RequestParam String text,
-                                @RequestParam(required = false) Optional<Integer> from,
+                                @RequestParam(required = false, defaultValue = "0") int from,
                                 @RequestParam(required = false) Optional<Integer> size) {
 
-        if (from.isEmpty() && size.isEmpty()) {
-            return itemService.search(userId, text.toLowerCase(), 0, Integer.MAX_VALUE);
-        } else if (from.isEmpty() || size.isEmpty()) {
-            throw new BadRequestException();
-        }
 
-        return itemService.search(userId, text.toLowerCase(), from.get(), size.get());
+        return itemService.search(userId,
+                text.toLowerCase(),
+                from, size.orElse(Integer.MAX_VALUE));
     }
 
     @PostMapping("/{itemId}/comment")

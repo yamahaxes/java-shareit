@@ -206,6 +206,7 @@ class BookingControllerTest {
         verify(service, times(1)).getAllBooked(anyLong(), anyString(), eq(0), eq(Integer.MAX_VALUE));
     }
 
+
     @SneakyThrows
     @Test
     void getAllByOwner() {

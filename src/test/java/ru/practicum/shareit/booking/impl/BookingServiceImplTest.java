@@ -22,8 +22,7 @@ import ru.practicum.shareit.user.model.User;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -292,6 +291,69 @@ class BookingServiceImplTest {
     }
 
     @Test
+    void approve_whenApproved_thenApprovedStatus() {
+        User owner = new User();
+        owner.setId(1L);
+        Item item = new Item();
+        item.setOwner(owner);
+        Booking booking = new Booking();
+        booking.setItem(item);
+
+        when(repository.existsById(any()))
+                .thenReturn(true);
+        when(repository.getReferenceById(anyLong()))
+                .thenReturn(booking);
+        service.approve(1, 1, true);
+
+        assertEquals(BookingStatus.APPROVED, booking.getStatus());
+
+    }
+
+    @Test
+    void approve_whenNotApproved_thenRejectedStatus() {
+        User owner = new User();
+        owner.setId(1L);
+        Item item = new Item();
+        item.setOwner(owner);
+        Booking booking = new Booking();
+        booking.setItem(item);
+
+        when(repository.existsById(any()))
+                .thenReturn(true);
+        when(repository.getReferenceById(anyLong()))
+                .thenReturn(booking);
+        service.approve(1, 1, false);
+
+        assertEquals(BookingStatus.REJECTED, booking.getStatus());
+
+    }
+
+    @Test
+    void getById() {
+
+        User booker = new User();
+        booker.setId(1L);
+
+        User owner = new User();
+        owner.setId(9L);
+        Item item = new Item();
+        item.setOwner(owner);
+
+        Booking booking = new Booking();
+        booking.setBooker(booker);
+        booking.setItem(item);
+
+        when(repository.existsById(anyLong()))
+                .thenReturn(true);
+        when(repository.getReferenceById(any()))
+                .thenReturn(booking);
+        when(bookingResponseMapper.mapToDto(any()))
+                .thenReturn(new BookingDtoResponse());
+        service.getById(1, 1);
+        verify(bookingResponseMapper).mapToDto(any());
+    }
+
+    @Test
     void getById_whenWrongBooking_thenNotFoundException() {
 
         when(repository.existsById(anyLong()))
@@ -325,10 +387,32 @@ class BookingServiceImplTest {
 
     @Test
     void getAllBooked() {
+
+        assertDoesNotThrow(() -> service.getAllBooked(1, "ALL", 0, 10));
+
+    }
+
+    @Test
+    void getAllBooked_whenWrongUser_thenNotFoundExcpetion() {
+        doThrow(NotFoundException.class)
+                .when(userService).existsUserByUserIdOrThrow(anyLong());
+        assertThrows(NotFoundException.class,
+                () -> service.getAllBooked(1, "ALL", 0, 100));
     }
 
     @Test
     void getAllByOwner() {
+
+        assertDoesNotThrow(() -> service.getAllByOwner(1, "ALL", 0, 100));
+
+    }
+
+    @Test
+    void getAllByOwner_whenWrongUser_thenNotFoundException() {
+        doThrow(NotFoundException.class)
+                .when(userService).existsUserByUserIdOrThrow(anyLong());
+        assertThrows(NotFoundException.class,
+                () -> service.getAllByOwner(1, "ALL", 0, 100));
     }
 
     private BookingDtoRequest makeBookingDtoRequest(int i) {
