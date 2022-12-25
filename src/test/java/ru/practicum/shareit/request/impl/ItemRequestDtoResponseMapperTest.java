@@ -6,6 +6,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.item.ItemRepository;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.mapper.ModelMapper;
 import ru.practicum.shareit.request.dto.ItemRequestDtoResponse;
 import ru.practicum.shareit.request.model.ItemRequest;
 
@@ -13,13 +16,16 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ItemRequestDtoResponseMapperTest {
 
     @InjectMocks
     private ItemRequestDtoResponseMapper mapper;
+
+    @Mock
+    private ModelMapper<Item, ItemDto> itemMapper;
 
     @Mock
     private ItemRepository itemRepository;
@@ -38,7 +44,7 @@ class ItemRequestDtoResponseMapperTest {
 
         when(itemRepository.getItemsByItemRequest_Id(anyLong()))
                 .thenReturn(new ArrayList<>());
-
         assertDoesNotThrow(() -> mapper.mapToDto(itemRequest));
+        verify(itemMapper, times(0)).mapToDto(new Item());
     }
 }
