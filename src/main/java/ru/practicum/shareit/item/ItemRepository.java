@@ -5,7 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.model.ItemRequest;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,4 +23,6 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> findContainingText(@Param("text") String text, Pageable pageable);
 
     List<Item> getItemsByItemRequest_Id(long itemRequestId);
+
+    List<Item> getItemsByItemRequestIsIn(Collection<ItemRequest> itemRequest);
 }

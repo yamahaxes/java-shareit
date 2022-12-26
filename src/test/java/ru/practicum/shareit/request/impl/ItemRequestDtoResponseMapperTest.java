@@ -13,8 +13,10 @@ import ru.practicum.shareit.request.dto.ItemRequestDtoResponse;
 import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -46,5 +48,28 @@ class ItemRequestDtoResponseMapperTest {
                 .thenReturn(new ArrayList<>());
         assertDoesNotThrow(() -> mapper.mapToDto(itemRequest));
         verify(itemMapper, times(0)).mapToDto(new Item());
+    }
+
+    @Test
+    void mapToDtoList() {
+
+        ItemRequest itemRequest1 = new ItemRequest();
+        itemRequest1.setId(1L);
+
+        ItemRequest itemRequest2 = new ItemRequest();
+        itemRequest2.setId(2L);
+
+        List<ItemRequest> itemRequests = List.of(itemRequest1, itemRequest2);
+
+        when(itemRepository.getItemsByItemRequestIsIn(anyList()))
+                .thenReturn(new ArrayList<>());
+        assertDoesNotThrow(() -> mapper.mapToDto(itemRequests));
+
+    }
+
+    @Test
+    void mapFromDtoList() {
+        assertThrows(UnsupportedOperationException.class,
+                () -> mapper.mapFromDto(new ArrayList<>()));
     }
 }

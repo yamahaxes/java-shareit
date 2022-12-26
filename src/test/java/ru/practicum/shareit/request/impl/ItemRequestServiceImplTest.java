@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.mapper.ModelMapper;
+import ru.practicum.shareit.mapper.ModelMapperList;
 import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoResponse;
@@ -23,7 +24,6 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -38,7 +38,7 @@ class ItemRequestServiceImplTest {
     private UserService userService;
 
     @Mock
-    private ModelMapper<ItemRequest, ItemRequestDtoResponse> itemRequestDtoResponseMapper;
+    private ModelMapperList<ItemRequest, ItemRequestDtoResponse> itemRequestDtoResponseMapper;
     @Mock
     private ModelMapper<ItemRequest, ItemRequestDto> itemRequestDtoMapper;
 
@@ -100,22 +100,17 @@ class ItemRequestServiceImplTest {
     @Test
     void getUserRequests() {
 
-        List<ItemRequest> itemRequestsResult = new ArrayList<>();
         List<ItemRequestDtoResponse> itemRequestDtoResponses = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            itemRequestsResult.add(makeItemRequest(i));
             itemRequestDtoResponses.add(makeItemRequestDtoResponse(i));
         }
 
-        when(itemRequestDtoResponseMapper.mapToDto(itemRequestsResult.get(0)))
-                .thenReturn(itemRequestDtoResponses.get(0));
-        when(itemRequestDtoResponseMapper.mapToDto(itemRequestsResult.get(1)))
-                .thenReturn(itemRequestDtoResponses.get(1));
-
-        when(repository.getByRequestor_Id(anyLong(), any()))
-                .thenReturn(itemRequestsResult.stream()
-                        .sorted((o1, o2) -> o2.getCreated().compareTo(o1.getCreated()))
-                        .collect(Collectors.toList()));
+        when(itemRequestDtoResponseMapper.mapToDto(anyList()))
+                .thenReturn(
+                        itemRequestDtoResponses.stream()
+                                .sorted((o1, o2) -> o2.getCreated().compareTo(o1.getCreated()))
+                                .collect(Collectors.toList())
+                );
 
         assertEquals(itemRequestDtoResponses.size(), service.getUserRequests(1).size());
         assertEquals(itemRequestDtoResponses.get(0), service.getUserRequests(1).get(1));
@@ -133,19 +128,16 @@ class ItemRequestServiceImplTest {
 
     @Test
     void getOtherUserRequests() {
-
-        ItemRequest itemRequest1 = makeItemRequest(0);
-        ItemRequest itemRequest2 = makeItemRequest(1);
-
+        
         ItemRequestDtoResponse itemRequestDtoResponse1 = makeItemRequestDtoResponse(0);
         ItemRequestDtoResponse itemRequestDtoResponse2 = makeItemRequestDtoResponse(1);
 
-        when(repository.getOtherUserRequests(anyLong(), any()))
-                .thenReturn(List.of(itemRequest1, itemRequest2));
-        when(itemRequestDtoResponseMapper.mapToDto(itemRequest1))
-                .thenReturn(itemRequestDtoResponse1);
-        when(itemRequestDtoResponseMapper.mapToDto(itemRequest2))
-                .thenReturn(itemRequestDtoResponse2);
+        List<ItemRequestDtoResponse> itemRequestDtoResponseList = new ArrayList<>();
+        itemRequestDtoResponseList.add(itemRequestDtoResponse1);
+        itemRequestDtoResponseList.add(itemRequestDtoResponse2);
+
+        when(itemRequestDtoResponseMapper.mapToDto(anyList()))
+                .thenReturn(itemRequestDtoResponseList);
 
         assertEquals(List.of(itemRequestDtoResponse1, itemRequestDtoResponse2),
                 service.getOtherUserRequests(1, 0, 1));
