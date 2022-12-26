@@ -203,7 +203,7 @@ class BookingControllerTest {
                 .getContentAsString();
 
         assertEquals(objectMapper.writeValueAsString(List.of(response)), result);
-        verify(service, times(1)).getAllBooked(anyLong(), anyString(), eq(0), eq(Integer.MAX_VALUE));
+        verify(service, times(1)).getAllBooked(anyLong(), anyString(), eq(0), eq(10));
     }
 
 

@@ -1,6 +1,8 @@
 package ru.practicum.shareit.request.model;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;

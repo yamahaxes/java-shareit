@@ -51,9 +51,9 @@ class ItemRequestServiceImplTestIT {
         requestor1 = userRepository.save(requestor1);
         requestor2 = userRepository.save(requestor2);
 
-        itemRequest1 = makeItemRequest(requestor1);
-        itemRequest2 = makeItemRequest(requestor2);
-        itemRequest3 = makeItemRequest(requestor2);
+        itemRequest1 = makeItemRequest(requestor1, LocalDateTime.now().minusDays(3));
+        itemRequest2 = makeItemRequest(requestor2, LocalDateTime.now().minusDays(2));
+        itemRequest3 = makeItemRequest(requestor2, LocalDateTime.now().minusDays(1));
 
         itemRequest1 = itemRequestRepository.save(itemRequest1);
         itemRequest2 = itemRequestRepository.save(itemRequest2);
@@ -81,11 +81,11 @@ class ItemRequestServiceImplTestIT {
 
 
 
-    private ItemRequest makeItemRequest(User requestor) {
+    private ItemRequest makeItemRequest(User requestor, LocalDateTime created) {
         ItemRequest itemRequest = new ItemRequest();
         itemRequest.setRequestor(requestor);
         itemRequest.setDescription("itemrequest");
-        itemRequest.setCreated(LocalDateTime.now());
+        itemRequest.setCreated(created);
         return itemRequest;
     }
 }

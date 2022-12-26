@@ -78,6 +78,8 @@ class ItemRepositoryTestDataJpaTest {
                 pageable);
         assertEquals(item2.getId(), itemList.get(0).getId());
 
+        itemList = itemRepository.findContainingText("ss", pageable);
+        assertEquals(item4.getId(), itemList.get(0).getId());
     }
 
 }

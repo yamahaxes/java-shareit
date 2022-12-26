@@ -7,7 +7,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @AllArgsConstructor
 @RestController
@@ -39,23 +38,19 @@ public class ItemController {
     @GetMapping
     public List<ItemDto> getByUser(@RequestHeader("X-Sharer-User-Id") long userId,
                                    @RequestParam(required = false, defaultValue = "0") int from,
-                                   @RequestParam(required = false) Optional<Integer> size) {
+                                   @RequestParam(required = false, defaultValue = "10") int size) {
 
-        return itemService.getByUser(userId,
-                from,
-                size.orElse(Integer.MAX_VALUE));
+        return itemService.getByUser(userId, from, size);
     }
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestHeader("X-Sharer-User-Id") long userId,
                                 @RequestParam String text,
                                 @RequestParam(required = false, defaultValue = "0") int from,
-                                @RequestParam(required = false) Optional<Integer> size) {
+                                @RequestParam(required = false, defaultValue = "10") int size) {
 
 
-        return itemService.search(userId,
-                text.toLowerCase(),
-                from, size.orElse(Integer.MAX_VALUE));
+        return itemService.search(userId, text.toLowerCase(), from, size);
     }
 
     @PostMapping("/{itemId}/comment")

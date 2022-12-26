@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.practicum.shareit.booking.BookingList;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
@@ -41,6 +42,8 @@ class BookingServiceImplTest {
     private ModelMapper<Booking, BookingDtoRequest> bookingRequestMapper;
     @Mock
     private ModelMapper<Booking, BookingDtoResponse> bookingResponseMapper;
+    @Mock
+    private BookingList bookingList;
 
     @InjectMocks
     private BookingServiceImpl service;
@@ -50,6 +53,7 @@ class BookingServiceImplTest {
         service = new BookingServiceImpl(repository,
                 itemRepository,
                 userService,
+                bookingList,
                 bookingRequestMapper,
                 bookingResponseMapper);
     }

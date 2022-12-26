@@ -31,6 +31,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository repository;
     private final ItemRepository itemRepository;
     private final UserService userService;
+    private final BookingList bookingList;
 
     private final ModelMapper<Booking, BookingDtoRequest> bookingRequestMapper;
     private final ModelMapper<Booking, BookingDtoResponse> bookingResponseMapper;
@@ -129,8 +130,7 @@ public class BookingServiceImpl implements BookingService {
         Pageable requestPage = new CustomRequestPage(from, size, Sort.by("start").descending());
 
         return bookingListToDtoResponse(
-                new BookingList(repository)
-                        .getByBookerId(state, userId, requestPage)
+                bookingList.getByBookerId(state, userId, requestPage)
         );
     }
 
@@ -141,8 +141,7 @@ public class BookingServiceImpl implements BookingService {
         Pageable pageRequest = new CustomRequestPage(from, size, Sort.by("start").descending());
 
         return bookingListToDtoResponse(
-                new BookingList(repository)
-                        .getByItem_Owner_Id(state, ownerId, pageRequest)
+               bookingList.getByItem_Owner_Id(state, ownerId, pageRequest)
         );
     }
 

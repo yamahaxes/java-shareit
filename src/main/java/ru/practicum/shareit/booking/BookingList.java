@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.BadRequestException;
 
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Service
 public class BookingList {
     private final BookingRepository repository;
 

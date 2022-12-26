@@ -7,7 +7,6 @@ import ru.practicum.shareit.request.dto.ItemRequestDtoResponse;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
@@ -30,9 +29,9 @@ public class ItemRequestController {
     @GetMapping("/all")
     public List<ItemRequestDtoResponse> getOtherUserRequestsWithPagination(@RequestHeader("X-Sharer-User-Id") long userId,
                                                @RequestParam(required = false, defaultValue = "0") int from,
-                                               @RequestParam(required = false) Optional<Integer> size) {
+                                               @RequestParam(required = false, defaultValue = "10") int size) {
 
-        return service.getOtherUserRequests(userId, from, size.orElse(Integer.MAX_VALUE));
+        return service.getOtherUserRequests(userId, from, size);
     }
 
     @GetMapping("/{id}")
