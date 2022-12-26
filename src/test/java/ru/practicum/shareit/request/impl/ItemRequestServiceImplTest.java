@@ -128,7 +128,6 @@ class ItemRequestServiceImplTest {
 
     @Test
     void getOtherUserRequests() {
-        
         ItemRequestDtoResponse itemRequestDtoResponse1 = makeItemRequestDtoResponse(0);
         ItemRequestDtoResponse itemRequestDtoResponse2 = makeItemRequestDtoResponse(1);
 
