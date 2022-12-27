@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.impl;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.BookingStatus;
@@ -16,7 +17,9 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.mapper.ModelMapper;
+import ru.practicum.shareit.page.CustomRequestPage;
 import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.util.ShareItUtils;
 
@@ -26,21 +29,23 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class ItemServiceImpl implements ItemService {
 
-    private final ModelMapper<Item, ItemDto> itemModelMapper;
-    private final ModelMapper<Booking, BookingDtoResponseInfo> bookingMapper;
-    private final ModelMapper<Comment, CommentDto> commentMapper;
     private final ItemRepository repository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final UserService userService;
+
+    private final ModelMapper<Item, ItemDto> itemModelMapper;
+    private final ModelMapper<Booking, BookingDtoResponseInfo> bookingMapper;
+    private final ModelMapper<Comment, CommentDto> commentMapper;
 
     @Override
     public ItemDto create(ItemDto itemDto, long ownerId) {
-        existsUserByUserIdOrThrow(ownerId);
+        userService.existsUserByUserIdOrThrow(ownerId);
 
         Item item = itemModelMapper.mapFromDto(itemDto);
         item.setOwner(userRepository.getReferenceById(ownerId));
@@ -82,26 +87,27 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getByUser(long ownerId) {
-        existsUserByUserIdOrThrow(ownerId);
+    public List<ItemDto> getByUser(long ownerId, int from, int size) {
+        userService.existsUserByUserIdOrThrow(ownerId);
+        Pageable pageRequest = new CustomRequestPage(from, size);
 
-        return itemListMapToDto(repository.getItemsByOwnerId(ownerId), ownerId);
+        return itemListMapToDto(repository.getItemsByOwnerId(ownerId, pageRequest), ownerId);
     }
 
     @Override
-    public List<ItemDto> search(long userId, String text) {
+    public List<ItemDto> search(long userId, String text, int from, int size) {
         if (text.isBlank()) {
             return new ArrayList<>();
         }
+        Pageable pageRequest = new CustomRequestPage(from, size);
 
-        return itemListMapToDto(repository.findContainingText(text), userId);
+        return itemListMapToDto(repository.findContainingText(text, pageRequest), userId);
     }
 
     @Override
     public CommentDto createComment(long userId, CommentDto commentDto) {
+        userService.existsUserByUserIdOrThrow(userId);
         commentDto.setCreated(LocalDateTime.now());
-
-        existsUserByUserIdOrThrow(userId);
 
         User author = userRepository.getReferenceById(userId);
         commentDto.setAuthorName(author.getName());
@@ -134,12 +140,14 @@ public class ItemServiceImpl implements ItemService {
 
         itemDtoList.forEach(itemDto -> {
                     Booking nextBooking = approvedBookings.stream()
-                            .filter(booking -> booking.getItem().getId() == itemDto.getId() && booking.getStart().isAfter(now))
+                            .filter(booking -> booking.getItem().getId() == itemDto.getId()
+                                    && booking.getStart().isAfter(now))
                             .min(Comparator.comparing(Booking::getStart))
                             .orElse(null);
 
                     Booking lastBooking = approvedBookings.stream()
-                            .filter(booking -> booking.getItem().getId() == itemDto.getId() && booking.getStart().isBefore(now))
+                            .filter(booking -> booking.getItem().getId() == itemDto.getId()
+                                    && booking.getStart().isBefore(now))
                             .max(Comparator.comparing(Booking::getStart))
                             .orElse(null);
 
@@ -166,15 +174,10 @@ public class ItemServiceImpl implements ItemService {
         return allItemDto;
     }
 
-    private void existsItemByIdOrThrow(long itemId) {
+    @Override
+    public void existsItemByIdOrThrow(long itemId) {
         if (!repository.existsById(itemId)) {
             throw new NotFoundException("Item not found.");
-        }
-    }
-
-    private void existsUserByUserIdOrThrow(long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new NotFoundException("User not found.");
         }
     }
 }

@@ -67,7 +67,8 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
-    private void existsUserByUserIdOrThrow(long userId) {
+    @Override
+    public void existsUserByUserIdOrThrow(long userId) {
         if (!repository.existsById(userId)) {
             throw new NotFoundException("User not found.");
         }
