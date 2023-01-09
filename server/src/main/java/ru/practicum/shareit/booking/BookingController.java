@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -17,7 +16,7 @@ public class BookingController {
 
     @PostMapping
     public BookingDtoResponse create(@RequestHeader("X-Sharer-User-Id") long userId,
-                                     @Valid @RequestBody BookingDtoRequest bookingDtoRequest) {
+                                     @RequestBody BookingDtoRequest bookingDtoRequest) {
 
         return service.create(bookingDtoRequest, userId);
     }
@@ -42,7 +41,7 @@ public class BookingController {
                                                  @RequestParam(required = false, defaultValue = "0") int from,
                                                  @RequestParam(required = false, defaultValue = "10") int size) {
 
-        return service.getAllBooked(userId, state, from, size);
+        return service.getBookings(userId, state, from, size);
     }
 
     @GetMapping("/owner")
@@ -51,6 +50,6 @@ public class BookingController {
                                                   @RequestParam(required = false, defaultValue = "0") int from,
                                                   @RequestParam(required = false, defaultValue = "10") int size) {
 
-        return service.getAllByOwner(userId, state, from, size);
+        return service.getBookingsByOwner(userId, state, from, size);
     }
 }

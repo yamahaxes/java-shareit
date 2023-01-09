@@ -10,19 +10,11 @@ public class CustomRequestPage implements Pageable {
     private final Pageable pageable;
 
     public CustomRequestPage(int from, int size) {
-        checkRangePageable(from, size);
         pageable = PageRequest.of(from / size, size);
     }
 
     public CustomRequestPage(int from, int size, Sort sort) {
-        checkRangePageable(from, size);
         pageable = PageRequest.of(from / size, size, sort);
-    }
-
-    private void checkRangePageable(int from, int size) {
-        if (from < 0 || size < 1) {
-            throw new BadRequestException();
-        }
     }
 
     @Override

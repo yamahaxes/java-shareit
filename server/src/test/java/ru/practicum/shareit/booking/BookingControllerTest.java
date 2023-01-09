@@ -173,7 +173,7 @@ class BookingControllerTest {
     @Test
     void getAllBooked() {
         BookingDtoResponse response = new BookingDtoResponse();
-        when(service.getAllBooked(anyLong(), anyString(), anyInt(), eq(10)))
+        when(service.getBookings(anyLong(), anyString(), anyInt(), eq(10)))
                 .thenReturn(List.of(response));
 
         String result = mockMvc.perform(get("/bookings")
@@ -192,7 +192,7 @@ class BookingControllerTest {
     @Test
     void getAllBooked_whenFromAndSizeIsEmpty_thenSizeMaxAndFromIsZero() {
         BookingDtoResponse response = new BookingDtoResponse();
-        when(service.getAllBooked(anyLong(), anyString(), anyInt(), anyInt()))
+        when(service.getBookings(anyLong(), anyString(), anyInt(), anyInt()))
                 .thenReturn(List.of(response));
 
         String result = mockMvc.perform(get("/bookings")
@@ -203,7 +203,7 @@ class BookingControllerTest {
                 .getContentAsString();
 
         assertEquals(objectMapper.writeValueAsString(List.of(response)), result);
-        verify(service, times(1)).getAllBooked(anyLong(), anyString(), eq(0), eq(10));
+        verify(service, times(1)).getBookings(anyLong(), anyString(), eq(0), eq(10));
     }
 
 
@@ -212,7 +212,7 @@ class BookingControllerTest {
     void getAllByOwner() {
 
         BookingDtoResponse response = new BookingDtoResponse();
-        when(service.getAllByOwner(anyLong(), anyString(), anyInt(), eq(10)))
+        when(service.getBookingsByOwner(anyLong(), anyString(), anyInt(), eq(10)))
                 .thenReturn(List.of(response));
 
         String result = mockMvc.perform(get("/bookings/owner")

@@ -54,12 +54,6 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException("User is the owner the item.");
         }
 
-        LocalDateTime now = LocalDateTime.now();
-        if (!bookingDtoRequest.getStart().isBefore(bookingDtoRequest.getEnd())
-                || bookingDtoRequest.getStart().isBefore(now)) {
-            throw new BadRequestException("Incorrect period.");
-        }
-
         Optional<Booking> foundBooking = repository.checkBookingIntersectionByItem_Id(bookingDtoRequest.getItemId(),
                 bookingDtoRequest.getStart(),
                 bookingDtoRequest.getEnd());
@@ -124,7 +118,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoResponse> getAllBooked(long userId, String state, int from, int size) {
+    public List<BookingDtoResponse> getBookings(long userId, String state, int from, int size) {
         userService.existsUserByUserIdOrThrow(userId);
 
         Pageable requestPage = new CustomRequestPage(from, size, Sort.by("start").descending());
@@ -135,7 +129,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoResponse> getAllByOwner(long ownerId, String state, int from, int size) {
+    public List<BookingDtoResponse> getBookingsByOwner(long ownerId, String state, int from, int size) {
         userService.existsUserByUserIdOrThrow(ownerId);
 
         Pageable pageRequest = new CustomRequestPage(from, size, Sort.by("start").descending());

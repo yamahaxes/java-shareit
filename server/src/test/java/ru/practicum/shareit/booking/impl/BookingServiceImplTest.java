@@ -392,7 +392,7 @@ class BookingServiceImplTest {
     @Test
     void getAllBooked() {
 
-        assertDoesNotThrow(() -> service.getAllBooked(1, "ALL", 0, 10));
+        assertDoesNotThrow(() -> service.getBookings(1, "ALL", 0, 10));
 
     }
 
@@ -401,13 +401,13 @@ class BookingServiceImplTest {
         doThrow(NotFoundException.class)
                 .when(userService).existsUserByUserIdOrThrow(anyLong());
         assertThrows(NotFoundException.class,
-                () -> service.getAllBooked(1, "ALL", 0, 100));
+                () -> service.getBookings(1, "ALL", 0, 100));
     }
 
     @Test
     void getAllByOwner() {
 
-        assertDoesNotThrow(() -> service.getAllByOwner(1, "ALL", 0, 100));
+        assertDoesNotThrow(() -> service.getBookingsByOwner(1, "ALL", 0, 100));
 
     }
 
@@ -416,7 +416,7 @@ class BookingServiceImplTest {
         doThrow(NotFoundException.class)
                 .when(userService).existsUserByUserIdOrThrow(anyLong());
         assertThrows(NotFoundException.class,
-                () -> service.getAllByOwner(1, "ALL", 0, 100));
+                () -> service.getBookingsByOwner(1, "ALL", 0, 100));
     }
 
     private BookingDtoRequest makeBookingDtoRequest(int i) {

@@ -11,10 +11,15 @@ import java.time.LocalDateTime;
 public class BookingDtoResponse {
 
     private long id;
+
     private LocalDateTime start;
+
     private LocalDateTime end;
+
     private UserDto booker;
+
     private ItemDto item;
+
     private BookingStatus status;
 
 }
