@@ -11,6 +11,7 @@ public class CommentDto {
 
     private Long itemId;
 
+    @NotBlank
     private String text;
 
     private String authorName;

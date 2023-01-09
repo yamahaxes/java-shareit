@@ -12,10 +12,13 @@ import java.util.List;
 public class ItemDto {
     private long id;
 
+    @NotBlank
     private String name;
 
+    @NotBlank
     private String description;
 
+    @NotNull
     private Boolean available;
 
     private List<CommentDto> comments = new ArrayList<>();

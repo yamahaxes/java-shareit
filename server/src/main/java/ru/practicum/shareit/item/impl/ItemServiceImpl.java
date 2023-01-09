@@ -96,9 +96,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> search(long userId, String text, int from, int size) {
-        if (text.isBlank()) {
-            return new ArrayList<>();
-        }
         Pageable pageRequest = new CustomRequestPage(from, size);
 
         return itemListMapToDto(repository.findContainingText(text, pageRequest), userId);
