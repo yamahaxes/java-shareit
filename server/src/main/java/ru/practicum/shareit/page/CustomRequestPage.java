@@ -3,7 +3,6 @@ package ru.practicum.shareit.page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import ru.practicum.shareit.exception.BadRequestException;
 
 public class CustomRequestPage implements Pageable {
 
