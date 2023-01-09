@@ -7,6 +7,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class ItemRequestDto {
 
+    @NotBlank
     private String description;
 
 }
