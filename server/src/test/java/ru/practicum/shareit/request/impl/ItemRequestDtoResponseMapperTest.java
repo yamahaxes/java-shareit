@@ -44,7 +44,7 @@ class ItemRequestDtoResponseMapperTest {
         ItemRequest itemRequest = new ItemRequest();
         itemRequest.setId(1L);
 
-        when(itemRepository.getItemsByItemRequest_Id(anyLong()))
+        when(itemRepository.getItemsByItemRequest_IdOrderById(anyLong()))
                 .thenReturn(new ArrayList<>());
         assertDoesNotThrow(() -> mapper.mapToDto(itemRequest));
         verify(itemMapper, times(0)).mapToDto(new Item());
@@ -61,7 +61,7 @@ class ItemRequestDtoResponseMapperTest {
 
         List<ItemRequest> itemRequests = List.of(itemRequest1, itemRequest2);
 
-        when(itemRepository.getItemsByItemRequestIsIn(anyList()))
+        when(itemRepository.getItemsByItemRequestIsInOrderById(anyList()))
                 .thenReturn(new ArrayList<>());
         assertDoesNotThrow(() -> mapper.mapToDto(itemRequests));
 

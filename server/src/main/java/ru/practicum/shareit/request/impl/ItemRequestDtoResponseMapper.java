@@ -39,7 +39,7 @@ public class ItemRequestDtoResponseMapper implements ModelMapperList<ItemRequest
         fillProperties(itemRequest, itemRequestDtoResponse);
 
         itemRequestDtoResponse.setItems(
-                itemRepository.getItemsByItemRequest_Id(itemRequest.getId()).stream()
+                itemRepository.getItemsByItemRequest_IdOrderById(itemRequest.getId()).stream()
                         .map(itemMapper::mapToDto)
                         .collect(Collectors.toList())
         );
@@ -55,7 +55,7 @@ public class ItemRequestDtoResponseMapper implements ModelMapperList<ItemRequest
     @Override
     public List<ItemRequestDtoResponse> mapToDto(List<ItemRequest> entities) {
 
-        List<Item> items = itemRepository.getItemsByItemRequestIsIn(entities);
+        List<Item> items = itemRepository.getItemsByItemRequestIsInOrderById(entities);
         Map<Long, List<Item>> itemsMap = new HashMap<>();
         for (Item item: items) {
             long itemRequestId = item.getItemRequest().getId();

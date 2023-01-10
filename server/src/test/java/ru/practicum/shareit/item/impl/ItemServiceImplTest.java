@@ -203,7 +203,7 @@ class ItemServiceImplTest {
         ItemDto itemDto1 = makeItemDto(0);
         ItemDto itemDto2 = makeItemDto(1);
 
-        when(repository.getItemsByOwnerId(anyLong(), any()))
+        when(repository.getItemsByOwnerIdOrderById(anyLong(), any()))
                 .thenReturn(List.of(item1, item2));
         when(itemModelMapper.mapToDto(item1))
                 .thenReturn(itemDto1);

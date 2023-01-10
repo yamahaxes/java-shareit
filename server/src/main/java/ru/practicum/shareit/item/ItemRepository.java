@@ -14,15 +14,16 @@ import java.util.Optional;
 public interface ItemRepository extends JpaRepository<Item, Long> {
     Optional<Item> getItemByIdAndOwnerId(long id, long ownerId);
 
-    List<Item> getItemsByOwnerId(long ownerId, Pageable pageable);
+    List<Item> getItemsByOwnerIdOrderById(long ownerId, Pageable pageable);
 
     @Query("SELECT item " +
            "FROM Item item " +
            "WHERE (LOWER(item.name) LIKE %:text% OR LOWER(item.description) LIKE %:text%) " +
-           "   AND item.available = true")
+           "   AND item.available = true " +
+           "ORDER BY item.id")
     List<Item> findContainingText(@Param("text") String text, Pageable pageable);
 
-    List<Item> getItemsByItemRequest_Id(long itemRequestId);
+    List<Item> getItemsByItemRequest_IdOrderById(long itemRequestId);
 
-    List<Item> getItemsByItemRequestIsIn(Collection<ItemRequest> itemRequest);
+    List<Item> getItemsByItemRequestIsInOrderById(Collection<ItemRequest> itemRequest);
 }

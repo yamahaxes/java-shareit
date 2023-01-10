@@ -91,7 +91,7 @@ public class ItemServiceImpl implements ItemService {
         userService.existsUserByUserIdOrThrow(ownerId);
         Pageable pageRequest = new CustomRequestPage(from, size);
 
-        return itemListMapToDto(repository.getItemsByOwnerId(ownerId, pageRequest), ownerId);
+        return itemListMapToDto(repository.getItemsByOwnerIdOrderById(ownerId, pageRequest), ownerId);
     }
 
     @Override
