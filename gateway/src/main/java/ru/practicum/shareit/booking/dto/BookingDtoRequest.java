@@ -23,7 +23,7 @@ public class BookingDtoRequest {
     @JsonIgnore
     private Long bookerId;
 
-    public void validate(){
+    public void validate() {
         if (end.isBefore(start)) {
             throw new BadRequestException("End date before start date.");
         }
