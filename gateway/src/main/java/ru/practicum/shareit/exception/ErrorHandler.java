@@ -10,13 +10,6 @@ import java.util.Map;
 @RestControllerAdvice
 public class ErrorHandler {
 
-    /*@ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(value = {NotFoundException.class})
-    public Map<String, String> entityNotFound(RuntimeException e) {
-        String message = e.getMessage() == null ? "" : e.getMessage();
-        return Map.of("error", message);
-    }*/
-
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = {BadRequestException.class})
     public Map<String, String> badRequest(RuntimeException e) {

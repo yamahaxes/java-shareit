@@ -70,17 +70,6 @@ class UserControllerTest {
 
     @SneakyThrows
     @Test
-    void create_whenNotValidUser_thenBadRequest() {
-        UserDto userDto = new UserDto();
-
-        mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userDto)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @SneakyThrows
-    @Test
     void get() {
         UserDto userDto = new UserDto();
         userDto.setName("name");

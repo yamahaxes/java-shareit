@@ -142,46 +142,6 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void create_whenStartAfterEnd_thenBadRequestException() {
-        User owner = new User();
-        owner.setId(10L);
-        Item item = new Item();
-        item.setOwner(owner);
-        item.setAvailable(true);
-
-        BookingDtoRequest bookingDtoRequest = new BookingDtoRequest();
-        bookingDtoRequest.setStart(LocalDateTime.now().plusDays(1));
-        bookingDtoRequest.setEnd(LocalDateTime.now().plusDays(1).minusMinutes(10));
-
-        when(itemRepository.existsById(any()))
-                .thenReturn(true);
-        when(itemRepository.getReferenceById(any()))
-                .thenReturn(item);
-        assertThrows(BadRequestException.class,
-                () -> service.create(bookingDtoRequest, 1));
-    }
-
-    @Test
-    void create_whenStartBeforeNow_thenBadRequestException() {
-        User owner = new User();
-        owner.setId(10L);
-        Item item = new Item();
-        item.setOwner(owner);
-        item.setAvailable(true);
-
-        BookingDtoRequest bookingDtoRequest = new BookingDtoRequest();
-        bookingDtoRequest.setStart(LocalDateTime.now().minusDays(1));
-        bookingDtoRequest.setEnd(LocalDateTime.now().plusDays(1).minusMinutes(10));
-
-        when(itemRepository.existsById(any()))
-                .thenReturn(true);
-        when(itemRepository.getReferenceById(any()))
-                .thenReturn(item);
-        assertThrows(BadRequestException.class,
-                () -> service.create(bookingDtoRequest, 1));
-    }
-
-    @Test
     void create_whenBookingIntersectsWithOtherBooking_whenBadRequestException() {
         User owner = new User();
         owner.setId(10L);

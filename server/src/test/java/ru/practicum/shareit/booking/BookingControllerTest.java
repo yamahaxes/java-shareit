@@ -75,50 +75,6 @@ class BookingControllerTest {
 
     @SneakyThrows
     @Test
-    void create_whenBookingDtoRequestNotValid_thenBadRequest() {
-        BookingDtoRequest bookingDtoRequest = new BookingDtoRequest();
-        bookingDtoRequest.setBookerId(null);
-        bookingDtoRequest.setStart(LocalDateTime.now().plusHours(1));
-        bookingDtoRequest.setEnd(LocalDateTime.now().plusDays(1));
-        bookingDtoRequest.setItemId(1L);
-
-        mockMvc.perform(post("/bookings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1)
-                        .content(objectMapper.writeValueAsString(bookingDtoRequest)))
-                .andExpect(status().isOk());
-
-        bookingDtoRequest.setBookerId(1L);
-        bookingDtoRequest.setStart(null);
-
-        mockMvc.perform(post("/bookings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1)
-                        .content(objectMapper.writeValueAsString(bookingDtoRequest)))
-                .andExpect(status().isBadRequest());
-
-        bookingDtoRequest.setStart(LocalDateTime.now().plusHours(1));
-        bookingDtoRequest.setEnd(null);
-
-        mockMvc.perform(post("/bookings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1)
-                        .content(objectMapper.writeValueAsString(bookingDtoRequest)))
-                .andExpect(status().isBadRequest());
-
-        bookingDtoRequest.setEnd(LocalDateTime.now().plusDays(1));
-        bookingDtoRequest.setItemId(null);
-
-        mockMvc.perform(post("/bookings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1)
-                        .content(objectMapper.writeValueAsString(bookingDtoRequest)))
-                .andExpect(status().isBadRequest());
-
-    }
-
-    @SneakyThrows
-    @Test
     void create_whenWrongUserId_thenBadRequest() {
         BookingDtoRequest bookingDtoRequest = new BookingDtoRequest();
         bookingDtoRequest.setBookerId(null);

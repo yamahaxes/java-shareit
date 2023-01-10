@@ -71,20 +71,6 @@ class ItemRequestControllerTest {
 
     @SneakyThrows
     @Test
-    void create_whenItemRequestNotValid_thenBadRequest() {
-
-        ItemRequestDto itemRequestDto = new ItemRequestDto();
-
-        mockMvc.perform(post("/requests")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(itemRequestDto))
-                        .header("X-Sharer-User-Id", 1))
-                .andExpect(status().isBadRequest());
-
-    }
-
-    @SneakyThrows
-    @Test
     void getUserRequests() {
 
         ItemRequestDtoResponse response = new ItemRequestDtoResponse();

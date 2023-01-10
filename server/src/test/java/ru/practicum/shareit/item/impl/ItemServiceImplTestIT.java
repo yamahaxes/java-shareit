@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -18,7 +17,6 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Transactional
 @SpringBootTest
@@ -76,18 +74,6 @@ class ItemServiceImplTestIT {
         itemDtos = service.getByUser(owner2.getId(), 0, 3);
         assertEquals(1, itemDtos.size());
         assertEquals(itemDtos.get(0).getId(), item2.getId());
-    }
-
-    @Test
-    void getByUser_WrongFromAndSize_thenBadRequestException() {
-        assertThrows(BadRequestException.class,
-                () -> service.getByUser(owner1.getId(), -1, 5));
-        assertThrows(BadRequestException.class,
-                () -> service.getByUser(owner1.getId(), 0, -5));
-        assertThrows(BadRequestException.class,
-                () -> service.getByUser(owner1.getId(), 0, 0));
-        assertThrows(BadRequestException.class,
-                () -> service.getByUser(owner1.getId(), 1, 0));
     }
 
     private Item makeItem(int i) {

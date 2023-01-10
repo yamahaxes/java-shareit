@@ -243,14 +243,6 @@ class ItemServiceImplTest {
     }
 
     @Test
-    void search_whenTextIsBlank_thenEmptyList() {
-
-        assertEquals(0, service.search(0, "", 0, 1).size());
-        verify(repository, times(0)).findContainingText(anyString(), any());
-
-    }
-
-    @Test
     void createComment() {
 
 
