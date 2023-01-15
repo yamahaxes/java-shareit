@@ -12,7 +12,7 @@ public class ErrorHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = {BadRequestException.class})
-    public Map<String, String> badRequest(RuntimeException e) {
+    public Map<String, String> badRequest(BadRequestException e) {
         String message = e.getMessage() == null ? "" : e.getMessage();
         return Map.of("error", message);
     }

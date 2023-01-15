@@ -31,8 +31,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public ResponseEntity<Object> getOtherUserRequestsWithPagination(@RequestHeader("X-Sharer-User-Id") long userId,
-                                               @PositiveOrZero @RequestParam(required = false, defaultValue = "0") int from,
-                                               @Positive @RequestParam(required = false, defaultValue = "10") int size) {
+                                               @PositiveOrZero @RequestParam(defaultValue = "0") int from,
+                                               @Positive @RequestParam(defaultValue = "10") int size) {
 
         return itemRequestClient.getOtherUserRequests(userId, from, size);
     }

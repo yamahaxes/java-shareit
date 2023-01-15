@@ -45,8 +45,8 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<Object> getBookings(@RequestHeader("X-Sharer-User-Id") long userId,
                                                  @RequestParam(defaultValue = "ALL") String state,
-                                                 @PositiveOrZero @RequestParam(required = false, defaultValue = "0") int from,
-                                                 @Positive @RequestParam(required = false, defaultValue = "10") int size) {
+                                                 @PositiveOrZero @RequestParam(defaultValue = "0") int from,
+                                                 @Positive @RequestParam(defaultValue = "10") int size) {
         BookingState bookingState = BookingState.from(state)
                 .orElseThrow(() -> new BadRequestException("Unknown state: UNSUPPORTED_STATUS"));
 
@@ -56,8 +56,8 @@ public class BookingController {
     @GetMapping("/owner")
     public ResponseEntity<Object> getBookingsByOwner(@RequestHeader("X-Sharer-User-Id") long userId,
                                                   @RequestParam(defaultValue = "ALL") String state,
-                                                  @PositiveOrZero @RequestParam(required = false, defaultValue = "0") int from,
-                                                  @Positive @RequestParam(required = false, defaultValue = "10") int size) {
+                                                  @PositiveOrZero @RequestParam(defaultValue = "0") int from,
+                                                  @Positive @RequestParam(defaultValue = "10") int size) {
         BookingState bookingState = BookingState.from(state)
                 .orElseThrow(() -> new BadRequestException("Unknown state: UNSUPPORTED_STATUS"));
 

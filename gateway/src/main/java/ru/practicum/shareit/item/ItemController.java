@@ -43,8 +43,8 @@ public class ItemController {
 
     @GetMapping
     public ResponseEntity<Object> getByUser(@RequestHeader("X-Sharer-User-Id") long userId,
-                                   @PositiveOrZero @RequestParam(required = false, defaultValue = "0") int from,
-                                   @Positive @RequestParam(required = false, defaultValue = "10") int size) {
+                                   @PositiveOrZero @RequestParam(defaultValue = "0") int from,
+                                   @Positive @RequestParam(defaultValue = "10") int size) {
 
         return itemClient.getItemsByUser(userId, from, size);
     }
@@ -52,8 +52,8 @@ public class ItemController {
     @GetMapping("/search")
     public ResponseEntity<Object> search(@RequestHeader("X-Sharer-User-Id") long userId,
                                 @RequestParam String text,
-                                @PositiveOrZero @RequestParam(required = false, defaultValue = "0") int from,
-                                @Positive @RequestParam(required = false, defaultValue = "10") int size) {
+                                @PositiveOrZero @RequestParam(defaultValue = "0") int from,
+                                @Positive @RequestParam(defaultValue = "10") int size) {
         if (text.length() == 0) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         }
