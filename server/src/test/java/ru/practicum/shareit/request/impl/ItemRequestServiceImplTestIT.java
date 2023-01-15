@@ -62,8 +62,8 @@ class ItemRequestServiceImplTestIT {
 
     @AfterEach
     void afterEach() {
-        userRepository.deleteAll();
         itemRequestRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test

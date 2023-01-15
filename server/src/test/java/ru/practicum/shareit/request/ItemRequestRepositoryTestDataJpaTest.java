@@ -25,8 +25,8 @@ class ItemRequestRepositoryTestDataJpaTest {
 
     @AfterEach
     void afterEach() {
-        userRepository.deleteAll();
         itemRequestRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
